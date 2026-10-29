@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="canonical" href="https://kx9.tech/docs.html">
+<title>KX-9 Docs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="pages.css">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%201254%201254%22%3E%3Crect%20width%3D%221254%22%20height%3D%221254%22%20rx%3D%22240%22%20fill%3D%22%23000%22/%3E%3Cg%20transform%3D%22translate%28627%20627%29%20scale%280.78%29%20translate%28-629%20-656%29%22%20fill%3D%22%23008cff%22%3E%3Cpolygon%20points%3D%2270%2C175%20428%2C175%20708%2C455%20708%2C560%20595%2C447%20275%2C447%2070%2C252%22/%3E%3Cpolygon%20points%3D%221100%2C175%201188%2C175%201188%2C495%20905%2C770%20520%2C770%20400%2C885%20400%2C1137%2070%2C1137%2070%2C860%20375%2C563%20710%2C563%22/%3E%3Cpolygon%20points%3D%22525%2C780%20645%2C885%20975%2C885%201188%2C1080%201188%2C1137%20790%2C1137%20525%2C872%22/%3E%3C/g%3E%3C/svg%3E">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="/"><svg viewBox="40 145 1178 1022" aria-hidden="true"><g fill="currentColor"><polygon points="70,175 428,175 708,455 708,560 595,447 275,447 70,252"/><polygon points="1100,175 1188,175 1188,495 905,770 520,770 400,885 400,1137 70,1137 70,860 375,563 710,563"/><polygon points="525,780 645,885 975,885 1188,1080 1188,1137 790,1137 525,872"/></g></svg><b>KX-9</b><span>Docs</span></a>
+  <nav><a href="docs.html" aria-current="page">Docs</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="risk.html">Risk</a></nav>
+  <span class="sp"></span>
+  <a class="btn" href="https://app.kx9.tech/">Launch App</a>
+</div></header>
+
+<div class="wrap layout">
+  <aside class="side" aria-label="Documentation">
+    <select id="jumpSel" aria-label="Jump to section"></select>
+    <div class="links" id="sideLinks"></div>
+  </aside>
+
+  <main class="doc">
+    <span class="kicker">KX-9 · Mainnet integration guide</span>
+    <h1>Connect, configure and operate KX-9</h1>
+    <p class="lead">The Command app uses a same-origin Core API, verified Robinhood mainnet reads and wallet-owned settings. Missing services stay unavailable; no demonstration vaults, prices, trades or history are generated.</p>
+    <p class="meta">Updated 29 Oct 2026 · Mainnet chain ID 4663 · Landing: kx9.tech · App: app.kx9.tech. Website publication, RPC connectivity and trading readiness are separate.</p>
+    <section id="quickstart" data-group="Getting started" data-title="Wallet &amp; sign-in">
+      <h2>Wallet and sign-in flow</h2>
+      <ol><li>Open <a href="https://app.kx9.tech/">KX-9 Command</a> and connect an EVM wallet.</li><li>Switch to Robinhood mainnet (4663). App reads use the private backend; wallet transactions use the wallet's own network provider. Network setup offers Robinhood's public RPC address, never the private server URL. The app's read-only proxy intentionally cannot broadcast transactions.</li><li>Select Sign in. The server creates an exact, domain-bound message with a five-minute, single-use challenge.</li><li>Review and sign the message in your wallet. Signing in does not send a transaction or cost gas.</li><li>The Core verifies the signature and discovers units owned by that wallet through the configured factory. An empty unit list means no verified unit was found—not that a new vault was created.</li><li>You can save protocol settings before commissioning. Saved settings do not start trades.</li></ol>
+      <p>Sessions expire after 24 hours. Settings and records are stored in PostgreSQL, not the deployment filesystem. Sign out revokes the current session.</p>
+    </section>
+    <section id="protocols" data-group="Operating" data-title="Five protocols">
+      <h2>Five configurable protocols</h2>
+      <div class="tbl"><table><thead><tr><th>Protocol</th><th>Inputs and behavior</th></tr></thead><tbody>
+        <tr><td>Accumulate</td><td>Asset, USDC budget and daily/weekly/monthly cadence. Scheduled purchases only with verified prices and permission.</td></tr>
+        <tr><td>Balance</td><td>Allocation target and drift threshold. Uses verified vault balances; missing prices block portfolio valuation.</td></tr>
+        <tr><td>Guard</td><td>Take-profit and stop-loss thresholds. Requires a confirmed purchase cost. A token transferred into the vault has no assumed entry price.</td></tr>
+        <tr><td>Trend</td><td>Asset, position size and oracle-observation window. An oracle observation is not a daily candle.</td></tr>
+        <tr><td>Physical AI · NVDA</td><td>Scheduled NVDA stock-token allocation and a dip-triggered additional budget. Requires the actual token address, fresh feed and execution liquidity.</td></tr>
+      </tbody></table></div>
+      <p><strong>Physical AI is a strategy name.</strong> It does not integrate NVIDIA AI, control a robot, create NVIDIA stock ownership, or imply a partnership. KX-9 is not affiliated with NVIDIA Corporation or Robinhood Markets. Stock-token availability, redemption and legal rights depend on the actual issuer and jurisdiction.</p>
+      <p>All protocols start off. Editing is local until Save protocols succeeds. A selected strategy is not evidence that execution is active. Account defaults are applied to newly discovered units; each existing unit has separately saved settings.</p>
+    </section>
+    <section id="decisions" data-group="Operating" data-title="Decision &amp; approval flow">
+      <h2>Decision, risk and execution flow</h2>
+      <ol><li>The rule-based Analyst considers saved protocols and verified oracle observations.</li><li>The Risk Officer checks unit class, mode, both asset permissions, trade limit, daily usage, cooldown, input balance, feed freshness, sequencer uptime and a real router quote.</li><li>A failed check records a veto; no transaction is sent.</li><li>In Supervised mode, the operator signs <code>approveProposal</code> on the Shield. The Core checks the successful transaction's sender, destination, proposal ID, amount, expiry and unused on-chain approval.</li><li>An explicitly enabled executor may submit through the configured Shield and router. Submitted is not Confirmed. Confirmation is reconciled from the mainnet receipt.</li><li>In Autonomous mode, a verified Mk II or Mk III holding and all risk checks are still required. Standby blocks new submissions; a transaction already broadcast cannot be cancelled by changing a label in the app.</li></ol>
+      <p>Missing executor settings do not fall back to simulated fills. Optional AI narration can only explain a fixed proposal; it cannot choose trade amounts, waive risk checks or sign transactions.</p>
+    </section>
+    <section id="shield" data-group="Operating" data-title="Shield changes">
+      <h2>Shield and mode changes</h2>
+      <p>Limits are read from the selected on-chain vault. The app stages an edit, shows differences, and asks the wallet to sign each required contract transaction. Changes are confirmed only after transaction verification and a fresh read-back of the values. No local-save branch substitutes for a chain transaction.</p>
+      <p>To commission a unit, the factory must be configured and the operator must confirm the deployment transaction in their wallet. KX9 token deployment remains the owner's responsibility. The supplied Shield sources are unchanged; tests are not an audit.</p>
+    </section>
+    <section id="history" data-group="Operating" data-title="Historical testing">
+      <h2>Historical testing without invented prices</h2>
+      <p>Sign in, save your settings, then choose Historical test. Upload a CSV with <code>date,close</code> columns, 2–366 increasing UTC daily dates and positive closing prices. Physical AI forces NVDA as the asset. The file is parsed in the browser; only the numeric observations are sent for calculation and they are not stored.</p>
+      <pre><code>date,close
+2026-01-02,120.50
+2026-01-05,121.20
+2026-01-06,118.80</code></pre>
+      <p>Results identify prices as operator-supplied, not independently certified. They use saved account protocol settings and daily closes. Returns exclude fees, gas, slippage, taxes and liquidity. Historical testing is not a forecast, a live transaction or proof of profitability.</p>
+    </section>
+    <section id="records" data-group="Data" data-title="Black Box &amp; Passport">
+      <h2>Black Box, Passport and live updates</h2>
+      <p>The Black Box records actual proposal, veto, approval and transaction events. Search and role filters apply to the current wallet's records. Times use UTC. Records have SHA-256 integrity hashes; these are not independent validator signatures or ERC-8004 attestations.</p>
+      <p>The Passport shows verified operator, unit and Shield identity. Reputation scores, uptime and breach counts remain unavailable unless independently measured; no placeholder score is presented. The Core streams authenticated server-sent events, with six-second state polling as a fallback and refresh on window focus.</p>
+      <p>In Protocols, Export my data downloads your off-chain settings and records. Delete off-chain data requires explicit confirmation and revokes sessions. It does not withdraw funds, destroy a vault, erase blockchain history or revoke an executor's on-chain authority. Set the vault to Standby on-chain before deleting records if you need activity to stop.</p>
+    </section>
+    <section id="configuration" data-group="Deployment" data-title="Mainnet configuration">
+      <h2>Configuration and readiness</h2>
+      <p>Configure credentials only through workspace Secrets. Never put a private key or private RPC address into HTML or a public configuration file.</p>
+      <div class="tbl"><table><thead><tr><th>Setting</th><th>Purpose</th></tr></thead><tbody>
+        <tr><td>RPC_URL</td><td>HTTPS Robinhood mainnet provider. Server only; chain 4663 and a recent block must be verified.</td></tr>
+        <tr><td>DATABASE_URL</td><td>Managed PostgreSQL for challenges, sessions, wallet settings and unit records. Development schema changes are applied to production through Publish.</td></tr>
+        <tr><td>FACTORY</td><td>Verified KX9ShieldFactory deployment address. Empty means no unit discovery, never a fabricated vault.</td></tr>
+        <tr><td>KX9_TOKEN / CLASS_THRESHOLDS</td><td>Owner-deployed token and strictly increasing, positive class thresholds. No eligible tier is invented.</td></tr>
+        <tr><td>TOKENS / FEEDS</td><td>JSON maps from known symbols to verified token and Chainlink feed addresses. Token decimals are read from the actual contracts.</td></tr>
+        <tr><td>SEQUENCER_FEED</td><td>L2 uptime feed. Trading requires sequencer up plus a one-hour recovery grace period. Prices older than one hour are blocked.</td></tr>
+        <tr><td>ROUTER / QUOTER</td><td>Verified compatible SwapRouter02 and QuoterV2. The configured pool fee is 3000. No quote means no slippage estimate and no execution.</td></tr>
+        <tr><td>EXECUTOR_KEY / ENABLE_LIVE_EXECUTION</td><td>Optional server-only execution signer and explicit opt-in. The signer must match the vault's allowed executor. Do not enable spending until scope, funding, addresses and contract safety are verified.</td></tr>
+        <tr><td>ANTHROPIC_API_KEY / ANTHROPIC_MODEL</td><td>Optional text-only narration. No wallet addresses, signatures or keys are sent as model input. Rule facts remain visible; the model cannot change trade fields or bypass checks. Without this integration the Analyst remains rule-based.</td></tr>
+      </tbody></table></div>
+      <p>Publishing serves the website and API; it does not deploy contracts or fund an executor. The public <code>/api/v1/config</code> response contains contract addresses and capability flags only, never provider credentials or private keys.</p>
+    </section>
+    <section id="api" data-group="API reference" data-title="Endpoints">
+      <h2>API reference</h2>
+      <p>All Core routes use <code>/api/v1</code>. Sign-in creates an HttpOnly secure cookie; in-memory bearer authentication is supported for embedded browsers. State-changing requests must be JSON and same-origin. Tokens must never be placed in stream URLs. Errors return <code>{"error":{"code":"…","message":"…"}}</code>. Owner-scoped routes reject unauthenticated access.</p>
+      <div class="tbl"><table><thead><tr><th>Method</th><th>Route</th><th>Purpose</th></tr></thead><tbody>
+        <tr><td>GET</td><td>/health, /config, /prices</td><td>Readiness, public settings and fresh prices; absent prices are null.</td></tr>
+        <tr><td>POST</td><td>/auth/nonce, /auth/verify, /auth/logout</td><td>Challenge, exact signature verification, session revocation.</td></tr>
+        <tr><td>GET</td><td>/auth/session, /units</td><td>Restore the signed-in account and discover real units.</td></tr>
+        <tr><td>GET / PUT</td><td>/settings/protocols</td><td>Persistent account defaults without creating a vault.</td></tr>
+        <tr><td>GET</td><td>/units/:id, /units/:id/state, /units/:id/telemetry</td><td>Owner-verified identity and current state.</td></tr>
+        <tr><td>PATCH</td><td>/units/:id/mode</td><td>Verify a successful setMode transaction and current chain state.</td></tr>
+        <tr><td>POST</td><td>/units/:id/diagnostic</td><td>Report actual connected-service checks.</td></tr>
+        <tr><td>GET / PUT</td><td>/units/:id/protocols</td><td>Per-unit protocol settings.</td></tr>
+        <tr><td>GET / PUT / POST</td><td>/units/:id/shield, /units/:id/shield/prepare</td><td>Read, prepare wallet transactions, verify read-back.</td></tr>
+        <tr><td>GET / POST</td><td>/units/:id/proposals, /proposals/:id/approve, /proposals/:id/reject</td><td>Review proposals, verify on-chain approval or reject.</td></tr>
+        <tr><td>GET</td><td>/units/:id/blackbox, /units/:id/passport</td><td>Wallet-owned records; Black Box accepts role, q, cursor and limit.</td></tr>
+        <tr><td>POST</td><td>/simulations</td><td>Replay saved settings on supplied date/close observations.</td></tr>
+        <tr><td>GET</td><td>/stream</td><td>Authenticated SSE notifications; periodic reconnect and polling fallback.</td></tr>
+        <tr><td>GET / DELETE</td><td>/account</td><td>Export or explicitly delete off-chain data. DELETE requires X-KX9-Confirm: delete-offchain-data.</td></tr>
+      </tbody></table></div>
+      <p>The separate read-only RPC boundary is <code>GET /api/rpc/status</code> and <code>POST /api/rpc</code>. It rejects transaction submission, arbitrary upstream URLs, tracing, unbounded logs and unsupported batch requests.</p>
+    </section>
+
+</main>
+</div>
+
+<footer><div class="wrap">
+  <span>© 2026 KX-9. Independent project built on Robinhood Chain; not affiliated with Robinhood Markets, Inc.</span>
+  <nav><a href="/">Home</a><a href="docs.html">Docs</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="risk.html">Risk Disclosure</a></nav>
+</div><div class="kx9-project-links" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;padding:20px 24px;font-size:12px;border-top:1px solid rgba(150,170,220,.16)"><a href="https://github.com/kx9-dev" target="_blank" rel="noopener noreferrer">GitHub · kx9-dev</a><a href="mailto:dev@kx9.tech">dev@kx9.tech</a></div>
+</footer>
+
+<script>
+(function(){
+  var secs=[].slice.call(document.querySelectorAll('main section[id]'));
+  var side=document.getElementById('sideLinks'),sel=document.getElementById('jumpSel'),g=null,html='',opts='',og=null;
+  secs.forEach(function(s){
+    if(s.dataset.group!==g){g=s.dataset.group;html+='<h4>'+g+'</h4>';if(og)opts+='</optgroup>';opts+='<optgroup label="'+g+'">';og=1}
+    html+='<a href="#'+s.id+'" data-id="'+s.id+'">'+s.dataset.title+'</a>';
+    opts+='<option value="'+s.id+'">'+s.dataset.title+'</option>';
+  });
+  side.innerHTML=html;sel.innerHTML=opts+'</optgroup>';
+  sel.addEventListener('change',function(){var t=document.getElementById(sel.value);if(t)t.scrollIntoView()});
+  var links=[].slice.call(side.querySelectorAll('a'));
+  function spy(){var cur=secs[0].id;secs.forEach(function(s){if(s.getBoundingClientRect().top<140)cur=s.id});
+    links.forEach(function(a){a.classList.toggle('on',a.dataset.id===cur)});sel.value=cur}
+  addEventListener('scroll',spy,{passive:true});spy();
+})();
+</script>
+</body>
+</html>

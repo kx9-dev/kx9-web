@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="canonical" href="https://kx9.tech/">
+<title>KX-9</title>
+<meta name="description" content="Autonomous AI trading units on Robinhood Chain. Every KX-9 unit has an ERC-8004 passport, hard on-chain Shield limits and a public Black Box of every decision.">
+<meta name="theme-color" content="#04050b">
+<meta name="application-name" content="KX-9">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KX-9">
+<meta property="og:title" content="KX-9 · Deploy your robotic agent on-chain">
+<meta property="og:description" content="Autonomous AI trading units on Robinhood Chain. Every KX-9 unit has an ERC-8004 passport, hard on-chain Shield limits and a public Black Box of every decision.">
+<meta property="og:url" content="https://kx9.tech/">
+<meta property="og:image" content="https://kx9.tech/og-landing.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="KX-9 logo and neon robot with the headline Deploy your robotic agent on-chain">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="KX-9 · Deploy your robotic agent on-chain">
+<meta name="twitter:description" content="Autonomous AI trading units on Robinhood Chain. Every KX-9 unit has an ERC-8004 passport, hard on-chain Shield limits and a public Black Box of every decision.">
+<meta name="twitter:image" content="https://kx9.tech/og-landing.png">
+<meta name="twitter:image:alt" content="KX-9 logo and neon robot with the headline Deploy your robotic agent on-chain">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%201254%201254%22%3E%3Crect%20width%3D%221254%22%20height%3D%221254%22%20rx%3D%22240%22%20fill%3D%22%23000%22/%3E%3Cg%20transform%3D%22translate%28627%20627%29%20scale%280.78%29%20translate%28-629%20-656%29%22%20fill%3D%22%23008cff%22%3E%3Cpolygon%20points%3D%2270%2C175%20428%2C175%20708%2C455%20708%2C560%20595%2C447%20275%2C447%2070%2C252%22/%3E%3Cpolygon%20points%3D%221100%2C175%201188%2C175%201188%2C495%20905%2C770%20520%2C770%20400%2C885%20400%2C1137%2070%2C1137%2070%2C860%20375%2C563%20710%2C563%22/%3E%3Cpolygon%20points%3D%22525%2C780%20645%2C885%20975%2C885%201188%2C1080%201188%2C1137%20790%2C1137%20525%2C872%22/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: layered parallax stage (deep grid, glow, giant outlined wordmark, robot) under a centred 1180px column; sections focus in from blur as they reach the viewport centre. Single deliberate dark look. */
+:root{
+  --bg:#05070e; --bg-2:#0a0f1e; --panel:#0c1222; --well:#070b16;
+  --line:rgba(130,160,255,.13); --line-2:rgba(130,160,255,.26);
+  --silver:#e4eaf5; --text:#a9b3c7; --dim:#66718a;
+  --volt:#4d7cff; --volt-hi:#89a8ff; --volt-soft:rgba(77,124,255,.14);
+  --signal:#ff4fa0; --signal-soft:rgba(255,79,160,.14);
+  --ok:#37d39a; --warn:#ffb547; --crit:#ff5c6c;
+  --f-display:"Michroma","Eurostile","Arial Black",sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --wrap:1180px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font:16px/1.6 var(--f-body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+a{color:inherit}
+h1,h2,h3{margin:0;color:var(--silver);font-weight:600;text-wrap:balance}
+p{margin:0}
+:focus-visible{outline:2px solid var(--volt-hi);outline-offset:3px;border-radius:6px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font:500 11px/1 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--volt-hi)}
+.wrap{max-width:var(--wrap);margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+
+/* ---------- Parallax backdrop ---------- */
+.backdrop{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.layer{position:absolute;inset:-20% -10%;will-change:transform}
+.l-grid{background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(60% 50% at 50% 40%,#000 0,transparent 80%);-webkit-mask-image:radial-gradient(60% 50% at 50% 40%,#000 0,transparent 80%);opacity:.55}
+.l-glow{background:radial-gradient(38% 30% at 30% 30%,rgba(77,124,255,.22),transparent 70%),radial-gradient(30% 26% at 78% 62%,rgba(255,79,160,.12),transparent 70%),radial-gradient(40% 30% at 50% 100%,rgba(77,124,255,.14),transparent 70%)}
+#dust{position:absolute;inset:0;width:100%;height:100%}
+
+/* ---------- Nav ---------- */
+.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:50;transition:background .3s,border-color .3s,backdrop-filter .3s}
+.nav.solid{background:rgba(5,7,14,.72);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:28px;height:68px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:34px;height:30px;color:#f2f5fb;filter:drop-shadow(0 0 10px rgba(0,140,255,.45))}
+.logo b{font:15px/1 var(--f-display);color:var(--silver);letter-spacing:.08em}
+.nav ul{display:flex;gap:24px;list-style:none;margin:0;padding:0;font-size:14px;font-weight:500}
+.nav ul a{text-decoration:none;color:var(--text)}
+.nav ul a:hover{color:var(--silver)}
+.nav .sp{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 20px;border-radius:12px;font-weight:600;font-size:14.5px;text-decoration:none;border:1px solid var(--line-2);color:var(--silver);background:rgba(16,23,43,.6);transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
+.btn:hover{border-color:var(--volt);transform:translateY(-1px)}
+.btn.primary{background:var(--volt);border-color:var(--volt);color:#fff;box-shadow:0 10px 30px -10px rgba(77,124,255,.8)}
+.btn.primary:hover{background:#5d88ff;box-shadow:0 14px 36px -10px rgba(77,124,255,.95)}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.nav .btn{padding:9px 16px;font-size:13.5px}
+
+/* ---------- Hero ---------- */
+main{position:relative;z-index:1}
+.hero{position:relative;min-height:min(920px,100vh);display:flex;align-items:center;padding-block:110px 60px;overflow:hidden}
+.wordmark{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);font:clamp(150px,30vw,420px)/1 var(--f-display);letter-spacing:.02em;color:transparent;-webkit-text-stroke:1px rgba(137,168,255,.16);white-space:nowrap;pointer-events:none;user-select:none;will-change:transform}
+.hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px;align-items:center;width:100%}
+.hero-copy{display:grid;gap:26px;will-change:transform,filter}
+.status{display:inline-flex;align-items:center;gap:10px;font:500 11.5px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--text);padding:9px 14px;border:1px solid var(--line-2);border-radius:999px;background:rgba(10,15,30,.6);width:max-content;max-width:100%}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:blink 2.4s infinite}
+@keyframes blink{50%{opacity:.35}}
+.hero h1{font:clamp(34px,5.2vw,64px)/1.06 var(--f-display);letter-spacing:-.01em}
+.hero h1 em{font-style:normal;color:transparent;background:linear-gradient(100deg,var(--volt-hi),#fff 45%,var(--signal));-webkit-background-clip:text;background-clip:text}
+.hero .lede{font-size:clamp(16px,1.6vw,19px);max-width:52ch;color:var(--text)}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.hero-stage{position:relative;aspect-ratio:1/1;max-width:100%;will-change:transform}
+.robot-slot{position:absolute;inset:0}
+.halo{position:absolute;inset:12% 10% 18%;border-radius:50%;background:radial-gradient(circle,rgba(77,124,255,.28),transparent 62%);filter:blur(10px)}
+.orbit{position:absolute;inset:6%;border-radius:50%;border:1px dashed rgba(137,168,255,.18);animation:spin 60s linear infinite}
+.orbit.o2{inset:16%;border-style:solid;border-color:rgba(255,79,160,.12);animation-duration:90s;animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tag{position:absolute;font:500 10.5px/1.5 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(7,11,22,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);will-change:transform}
+.tag b{display:block;color:var(--silver);font-weight:500}
+.tag.t1{top:12%;left:0}.tag.t2{top:20%;right:0}.tag.t3{bottom:16%;left:4%}
+.moods{position:absolute;left:50%;bottom:0;transform:translateX(-50%);display:flex;gap:6px;padding:5px;border-radius:999px;border:1px solid var(--line-2);background:rgba(7,11,22,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);max-width:100%;overflow-x:auto}
+.moods button{border:0;background:transparent;color:var(--text);font:600 12px/1 var(--f-body);padding:8px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.moods button[aria-pressed="true"]{background:var(--volt);color:#fff}
+.scroll-cue{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);font:500 10px/1 var(--f-mono);letter-spacing:.2em;color:var(--dim);display:grid;justify-items:center;gap:8px}
+.scroll-cue i{width:1px;height:34px;background:linear-gradient(var(--volt),transparent);animation:cue 1.8s infinite}
+@keyframes cue{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ---------- Ticker ---------- */
+.ticker{position:relative;border-block:1px solid var(--line);background:rgba(7,11,22,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow:hidden;padding-block:16px}
+.ticker-track{display:flex;gap:48px;padding-right:48px;white-space:nowrap;width:max-content;font:500 12px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);will-change:transform;animation:marquee 48s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+@keyframes marquee{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+.ticker-track span b{color:var(--silver);font-weight:500}
+.ticker-track span::before{content:"◆";color:var(--volt);margin-right:14px;font-size:9px;vertical-align:2px}
+
+/* ---------- Sections ---------- */
+section.block{position:relative;padding-block:clamp(90px,12vw,150px)}
+.focus{will-change:filter,opacity,transform;transition:filter .12s linear}
+.sec-head{display:grid;gap:18px;max-width:760px;margin-bottom:56px}
+.sec-head h2{font:clamp(28px,3.6vw,44px)/1.12 var(--f-display);letter-spacing:-.005em}
+.sec-head p{font-size:17px;max-width:60ch}
+
+.thesis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.thesis article{padding:28px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(16,23,43,.7),rgba(8,12,24,.7));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;gap:12px;align-content:start}
+.thesis .k{font:clamp(30px,3vw,40px)/1 var(--f-display);color:var(--silver)}
+.thesis h3{font-size:17px}
+.thesis p{font-size:15px}
+
+/* Anatomy: sticky robot + module scroll */
+.anatomy{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:start}
+.sticky-bot{position:sticky;top:110px;aspect-ratio:1/1;border-radius:24px;border:1px solid var(--line);background:radial-gradient(60% 50% at 50% 42%,rgba(77,124,255,.18),transparent 70%),linear-gradient(180deg,#0a0f1f,#05070e);overflow:hidden}
+.sticky-bot .robot-slot{inset:8% 0 12%}
+.sticky-bot .readout{position:absolute;left:18px;right:18px;bottom:16px;display:flex;justify-content:space-between;gap:10px;font:500 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.sticky-bot .readout b{color:var(--volt-hi);font-weight:500}
+.sticky-bot .corner{position:absolute;width:18px;height:18px;border-color:var(--line-2);border-style:solid}
+.c1{top:12px;left:12px;border-width:1px 0 0 1px}.c2{top:12px;right:12px;border-width:1px 1px 0 0}
+.mods{display:grid;gap:0}
+.mod{min-height:46vh;display:grid;align-content:center;gap:14px;padding-block:24px;border-top:1px solid var(--line)}
+.mod:first-child{border-top:0}
+.mod .idx{font:500 12px/1 var(--f-mono);color:var(--dim);letter-spacing:.14em}
+.mod h3{font:clamp(24px,2.6vw,32px)/1.15 var(--f-display)}
+.mod p{max-width:46ch}
+.mod ul{margin:4px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.mod li{font:500 11.5px/1 var(--f-mono);padding:7px 10px;border-radius:8px;border:1px solid var(--line-2);color:var(--text)}
+.mod.on .idx{color:var(--volt-hi)}
+
+/* Crew */
+.crew{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;position:relative}
+.crew-card{padding:26px;border-radius:4px;border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;gap:12px;align-content:start;position:relative}
+.crew-card .role{font:500 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase}
+.crew-card h3{font-size:20px}
+.crew-card:nth-child(1) .role{color:var(--volt-hi)}.crew-card:nth-child(2) .role{color:var(--warn)}.crew-card:nth-child(3) .role{color:var(--ok)}
+.crew-card:not(:last-child)::after{content:"";position:absolute;right:-17px;top:50%;width:18px;height:1px;background:var(--line-2)}
+.cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.case{padding:22px 24px;border-radius:4px;border:1px solid var(--line);--frame-bg:var(--well);display:grid;gap:10px}
+.case .verdict{display:inline-flex;align-items:center;gap:8px;font:500 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;padding:6px 9px;border-radius:6px;width:max-content}
+.case.ok .verdict{color:var(--ok);background:rgba(55,211,154,.13)}
+.case.no .verdict{color:var(--crit);background:rgba(255,92,108,.13)}
+.case .line{display:grid;grid-template-columns:100px minmax(0,1fr);gap:12px;font-size:14px}
+.case .line span{font:500 11px/1.8 var(--f-mono);color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+
+/* Protocols & modes */
+.split{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px}
+.protos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.proto{padding:22px;border-radius:4px;border:1px solid var(--line);display:grid;gap:8px}
+.proto h3{font:16px/1.2 var(--f-display);letter-spacing:.04em}
+.proto p{font-size:14.5px}
+.proto .risk{font:500 11px/1 var(--f-mono);color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-top:6px}
+.modes{display:grid;gap:12px;align-content:start}
+.mode{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;padding:18px 20px;border-radius:16px;border:1px solid var(--line);background:var(--well)}
+.mode i{grid-row:span 2;width:12px;height:12px;border-radius:50%;margin-top:6px}
+.mode b{color:var(--silver)}
+.mode span{font-size:14px}
+
+/* Passport */
+.pass{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:40px;align-items:center}
+.plate{position:relative;border-radius:22px;padding:30px;border:1px solid var(--line-2);background:linear-gradient(135deg,rgba(228,234,245,.09),rgba(228,234,245,0) 40%),repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0 2px,transparent 2px 5px),linear-gradient(160deg,#151c32,#0a0f1d);overflow:hidden;box-shadow:0 40px 80px -40px rgba(77,124,255,.45);will-change:transform}
+.plate::after{content:"";position:absolute;right:-70px;top:-70px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(77,124,255,.3),transparent 65%)}
+.plate .serial{font:clamp(30px,4.4vw,46px)/1 var(--f-display);color:var(--silver);letter-spacing:.05em;margin-top:12px;position:relative;z-index:1}
+.plate dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:18px 20px;margin:28px 0 0;position:relative;z-index:1}
+.plate dt{font:500 10px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.plate dd{margin:6px 0 0;color:var(--silver);font:500 13.5px/1.3 var(--f-mono)}
+.plate .spec{position:absolute;top:24px;right:24px;font:500 10px/1 var(--f-mono);letter-spacing:.16em;color:var(--warn);border:1px solid rgba(255,181,71,.35);padding:6px 8px;border-radius:6px;z-index:1}
+.regs{display:grid;gap:14px}
+.reg{display:grid;grid-template-columns:44px minmax(0,1fr);gap:16px;padding:18px 0;border-top:1px solid var(--line)}
+.reg:first-child{border-top:0}
+.reg .n{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;border:1px solid var(--line-2);font:13px/1 var(--f-display);color:var(--volt-hi)}
+.reg h3{font-size:17px;margin-bottom:4px}
+.reg p{font-size:15px}
+
+/* Flagship */
+.flag{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px}
+.panel{padding:24px;border-radius:4px;border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);min-width:0}
+.panel-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.panel-h h3{font-size:15px}
+.chip{font:500 10.5px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--warn);border:1px solid rgba(255,181,71,.35);background:rgba(255,181,71,.1);padding:6px 9px;border-radius:999px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.stats div{display:grid;gap:4px}
+.stats b{font:600 22px/1.1 var(--f-body);color:var(--silver);font-variant-numeric:tabular-nums}
+.stats span{font:500 10.5px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.spark{width:100%;height:150px;display:block}
+.bb{display:grid}
+.bb div{display:grid;grid-template-columns:50px 92px minmax(0,1fr);gap:10px;padding:11px 0;border-top:1px solid var(--line);font-size:13.5px;align-items:baseline}
+.bb div:first-child{border-top:0}
+.bb time{font:11.5px/1 var(--f-mono);color:var(--dim)}
+.bb .r{font:500 10px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+.ra{color:var(--volt-hi)}.rr{color:var(--warn)}.re{color:var(--ok)}
+
+/* Classes */
+.classes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.cls{padding:24px;border-radius:4px;border:1px solid var(--line);display:grid;gap:14px;align-content:start;position:relative;transition:transform .3s,border-color .3s}
+.cls:hover{transform:translateY(-4px);border-color:var(--line-2)}
+.cls.feat{border-color:rgba(77,124,255,.55);--frame-bg:linear-gradient(180deg,rgba(77,124,255,.18),rgba(12,18,34,.8))}
+.cls h3{font:20px/1 var(--f-display);letter-spacing:.04em}
+.cls .hold{font:500 12px/1 var(--f-mono);color:var(--dim)}
+.cls ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:14px}
+.cls li{display:flex;gap:10px}
+.cls li::before{content:"";flex:none;width:6px;height:6px;border-radius:2px;background:var(--volt);margin-top:9px}
+.fine{font-size:13px;color:var(--dim);margin-top:20px;max-width:80ch}
+
+/* Launch + roadmap */
+.launch{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:48px}
+.princ{display:grid;gap:0}
+.princ div{display:flex;gap:14px;padding:16px 0;border-top:1px solid var(--line);align-items:baseline}
+.princ div:first-child{border-top:0}
+.princ svg{width:18px;height:18px;flex:none;stroke:var(--ok);fill:none;stroke-width:2;transform:translateY(3px)}
+.princ b{color:var(--silver)}
+.road{display:grid;gap:14px;position:relative}
+.phase{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;padding:22px;border-radius:4px;border:1px solid var(--line)}
+.phase .ph{font:12px/1 var(--f-display);color:var(--volt-hi);letter-spacing:.06em;padding-top:4px;white-space:nowrap}
+.phase h3{font-size:18px;margin-bottom:6px}
+.phase .state{font:500 10.5px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;margin-top:10px;display:inline-block}
+
+/* FAQ */
+.faq{display:grid;gap:10px;max-width:860px}
+details{border:1px solid var(--line);border-radius:14px;background:rgba(12,18,34,.6);padding:0 22px}
+summary{cursor:pointer;list-style:none;padding:20px 0;font-weight:600;color:var(--silver);display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:20px/1 var(--f-mono);color:var(--volt-hi);transition:transform .2s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{padding-bottom:20px;max-width:70ch}
+
+/* Final CTA */
+.final{text-align:center;display:grid;justify-items:center;gap:24px}
+.final h2{font:clamp(32px,5vw,60px)/1.08 var(--f-display);max-width:16ch}
+.final p{max-width:52ch;font-size:17px}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--line);padding-block:36px env(safe-area-inset-bottom,0px);background:rgba(5,7,14,.85)}
+footer .wrap{display:block}
+footer p{font-size:13px;color:var(--dim);max-width:72ch}
+
+
+/* ===== ChainGPT-inspired layer: corner frames, centred hero, jump bar, grids ===== */
+.frame{--fc:rgba(137,168,255,.6);background:
+  linear-gradient(var(--fc),var(--fc)) top left/16px 1px no-repeat,linear-gradient(var(--fc),var(--fc)) top left/1px 16px no-repeat,
+  linear-gradient(var(--fc),var(--fc)) top right/16px 1px no-repeat,linear-gradient(var(--fc),var(--fc)) top right/1px 16px no-repeat,
+  linear-gradient(var(--fc),var(--fc)) bottom left/16px 1px no-repeat,linear-gradient(var(--fc),var(--fc)) bottom left/1px 16px no-repeat,
+  linear-gradient(var(--fc),var(--fc)) bottom right/16px 1px no-repeat,linear-gradient(var(--fc),var(--fc)) bottom right/1px 16px no-repeat,
+  var(--frame-bg,rgba(10,15,30,.55))}
+.hero{min-height:auto;padding-block:120px 40px;display:block;text-align:center}
+.hero-head{display:grid;justify-items:center;gap:22px;position:relative;z-index:2;grid-template-columns:minmax(0,1fr)}
+.hero-head>*{max-width:100%}
+.hero h1{font:clamp(34px,7.4vw,96px)/.98 var(--f-display);letter-spacing:-.01em;text-transform:uppercase;display:grid;gap:.06em}
+.hero h1 span{display:block}
+.hero h1 em{font-style:normal}
+.hero .lede{max-width:58ch;margin:0 auto}
+.ctas{justify-content:center}
+.hero-stage2{position:relative;max-width:1100px;margin:110px auto 0;display:grid;grid-template-columns:1fr minmax(0,560px) 1fr;align-items:center;gap:20px}
+.hero-stage2 .stagebox{position:relative;aspect-ratio:1/1;width:100%;margin-top:40px}
+.hero-stage2 .stagebox .robot-slot{inset:6% 0 -6%;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 58%,transparent 98%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 58%,transparent 98%)}
+.hero-stage2 .stagebox .moods{bottom:0}
+.hero{padding-bottom:70px}
+.rot{display:grid;gap:14px}
+.rot.right{justify-items:end}
+.rotp{--frame-bg:rgba(8,12,24,.7);padding:16px 18px;min-width:210px;max-width:250px;text-align:left;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;gap:8px;will-change:transform}
+.rotp .lab{font:500 10.5px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.rotp .val{font:13px/1.2 var(--f-display);color:var(--silver);letter-spacing:.04em;min-height:1.2em}
+.rotp .bar{height:2px;background:var(--line);overflow:hidden}
+.rotp .bar i{display:block;height:100%;width:40%;background:linear-gradient(90deg,var(--volt),var(--signal));animation:load 2.6s ease-in-out infinite}
+@keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+/* Section rail: fixed on the left edge, vertically centred */
+.jump{position:fixed;left:max(14px,env(safe-area-inset-left,0px));top:50%;transform:translateY(-50%);z-index:40}
+.jump .wrap{padding:0;max-width:none;margin:0}
+.jump nav{display:flex;flex-direction:column;gap:2px;padding:10px 8px;border:1px solid var(--line);border-radius:14px;background:rgba(6,9,18,.62);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.jump a{display:flex;align-items:center;gap:10px;font:500 10px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--dim);padding:7px 8px;border-radius:8px;white-space:nowrap;transition:color .2s,background .2s}
+.jump a::before{content:"";flex:none;width:14px;height:1px;background:currentColor;transition:width .25s,background .25s}
+.jump a:hover{color:var(--silver)}
+.jump a.on{color:var(--silver);background:var(--volt-soft)}
+.jump a.on::before{width:22px;background:var(--volt-hi);box-shadow:0 0 8px var(--volt)}
+@media (max-width:1440px){.jump a span{display:none}.jump a.on span,.jump a:hover span,.jump a:focus-visible span{display:inline}}
+@media (max-width:1000px){.jump nav{padding:8px 4px;background:rgba(6,9,18,.5)}.jump a{padding:6px 4px}.jump a::before{width:10px}.jump a.on::before{width:16px}.jump a span,.jump a.on span{display:none}}
+.caps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.cap{--frame-bg:rgba(8,12,24,.92);padding:30px 28px 32px;display:grid;gap:12px;align-content:start;position:relative;transition:background .3s}
+.cap:hover{--frame-bg:rgba(16,24,48,.95)}
+.cap .no{font:500 12px/1 var(--f-mono);color:var(--volt-hi);letter-spacing:.14em}
+.cap h3{font:17px/1.25 var(--f-display);letter-spacing:.02em}
+.cap p{font-size:14.5px}
+.cap .ico{position:absolute;top:26px;right:26px;width:30px;height:30px;stroke:var(--dim);fill:none;stroke-width:1.5;transition:stroke .3s,transform .3s}
+.cap:hover .ico{stroke:var(--volt-hi);transform:translateY(-2px)}
+.gate{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:40px;align-items:center}
+.counters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.counter{--frame-bg:rgba(10,15,30,.7);padding:26px;display:grid;gap:6px}
+.counter b{font:clamp(40px,5vw,64px)/1 var(--f-display);color:var(--silver);font-variant-numeric:tabular-nums}
+.counter span{font:500 11px/1.4 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.built{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px 48px;padding-block:34px;border-block:1px solid var(--line);margin-top:70px}
+.built .lab{font:500 11px/1 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--dim);width:100%;text-align:center}
+.built b{font:clamp(15px,1.6vw,20px)/1 var(--f-display);color:rgba(228,234,245,.62);letter-spacing:.06em;transition:color .2s}
+.built b:hover{color:var(--silver)}
+.layers{display:grid;gap:14px}
+.layerc{--frame-bg:rgba(10,15,30,.72);display:grid;grid-template-columns:120px minmax(0,1fr) minmax(0,1.2fr);gap:28px;align-items:center;padding:28px 30px}
+.layerc .ln{font:12px/1 var(--f-display);color:var(--volt-hi);letter-spacing:.08em}
+.layerc h3{font:clamp(20px,2.2vw,28px)/1.15 var(--f-display)}
+.layerc p{font-size:15px}
+.layerc.l4{border:1px solid rgba(77,124,255,.45);--frame-bg:linear-gradient(90deg,rgba(77,124,255,.16),rgba(10,15,30,.72))}
+.fcols{display:grid;grid-template-columns:1fr repeat(4,minmax(0,1fr));gap:32px;width:100%}
+.fcols h4{margin:0 0 12px;font:500 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--silver)}
+.fcols ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:14px}
+.fcols a{text-decoration:none;color:var(--dim)}
+.fcols a:hover{color:var(--silver)}
+.fbase{margin-top:32px;padding-top:24px;border-top:1px solid var(--line);width:100%}
+@media (max-width:1000px){
+  .hero-stage2{grid-template-columns:minmax(0,1fr);max-width:560px}
+  .hero-stage2 .stagebox{order:-1}
+  .rot{grid-template-columns:repeat(2,minmax(0,1fr));justify-items:stretch}
+  .rot.right{justify-items:stretch}
+  .rotp{max-width:none;min-width:0}
+  .caps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .gate{grid-template-columns:minmax(0,1fr)}
+  .layerc{grid-template-columns:minmax(0,1fr);gap:10px}
+  .fcols{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sticky-bot{position:relative;top:auto}
+}
+@media (max-width:640px){
+  .caps{grid-template-columns:minmax(0,1fr)}
+  .counters{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .counter{padding:18px}
+  .rot{grid-template-columns:minmax(0,1fr)}
+  .jump{display:none}
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1000px){
+  .nav ul{display:none}
+  .hero-grid{grid-template-columns:minmax(0,1fr)}
+  .hero{padding-block:100px 40px;min-height:auto}
+  .hero-stage{max-width:520px;width:100%;margin:0 auto;order:-1}
+  .thesis,.crew,.classes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .crew-card::after{display:none}
+  .anatomy{grid-template-columns:minmax(0,1fr);gap:24px}
+  .sticky-bot{top:76px;max-width:380px;width:100%;margin:0 auto;z-index:2;aspect-ratio:5/4}
+  .mod{min-height:auto;padding-block:36px}
+  .split,.pass,.flag,.launch{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  body{font-size:15px}
+  .thesis,.crew,.classes,.cases,.protos{grid-template-columns:minmax(0,1fr)}
+  .tag{display:none}
+  .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stats b{font-size:18px}
+  .bb div{grid-template-columns:44px minmax(0,1fr)}
+  .bb .r,.bb p{grid-column:2}
+  .case .line{grid-template-columns:minmax(0,1fr);gap:2px}
+  .sticky-bot{aspect-ratio:1/1;max-width:260px}
+  .nav .btn.ghost{display:none}
+  .moods button{padding:7px 10px;font-size:11.5px}
+  .scroll-cue{display:none}
+  .status{font-size:9.5px;letter-spacing:.08em;white-space:normal;text-align:left;width:auto}
+  .hero{padding-block:96px 30px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+
+/* ===== Premium robotic layer ===== */
+:root{--ch:12px;--chrome:linear-gradient(180deg,#ffffff 0%,#dfe6f3 38%,#9aa7c2 72%,#e9eef8 100%)}
+body::after{content:"";position:fixed;inset:0;z-index:70;pointer-events:none;background:repeating-linear-gradient(180deg,rgba(255,255,255,.022) 0 1px,transparent 1px 3px),radial-gradient(120% 90% at 50% 40%,transparent 60%,rgba(0,0,0,.55) 100%)}
+.sec-head h2,.final h2,.hero h1 span:not(:nth-child(2)){color:transparent;background:var(--chrome);-webkit-background-clip:text;background-clip:text}
+.hero h1 em{background:linear-gradient(100deg,#7fa0ff 0%,#dfe7ff 42%,#ff6fb1 100%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 24px rgba(77,124,255,.35))}
+/* chamfered controls */
+.btn{border-radius:0;clip-path:polygon(var(--ch) 0,100% 0,100% calc(100% - var(--ch)),calc(100% - var(--ch)) 100%,0 100%,0 var(--ch));text-transform:uppercase;letter-spacing:.12em;font-size:12.5px;font-weight:700;padding:14px 22px;position:relative;overflow:hidden}
+.nav .btn{padding:11px 18px;font-size:11.5px}
+.btn.primary{background:linear-gradient(180deg,#6a93ff,#3d66f0);box-shadow:none}
+.btn.primary::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s}
+.btn:hover::after{transform:translateX(120%)}
+.btn:not(.primary){background:rgba(12,18,34,.7);box-shadow:inset 0 0 0 1px var(--line-2)}
+.status,.moods,.jump nav{border-radius:0;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.moods button{border-radius:0;font:600 10.5px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase}
+.jump a{border-radius:0}
+/* HUD strip */
+.hudstrip{margin-top:28px;border-top:1px solid var(--line);font:500 10px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim);background:rgba(4,6,12,.6)}
+.hudstrip .wrap{display:flex!important;height:40px!important;align-items:center;gap:26px}
+.hudstrip b{color:var(--silver);font-weight:500}
+.hudstrip .ok{color:var(--ok)}
+.hudstrip .sp{flex:1}
+.hero{padding-top:120px}
+/* section system labels */
+.eyebrow.sys{display:flex;align-items:center;gap:14px}
+.eyebrow.sys .code{color:var(--dim)}
+.eyebrow.sys span{white-space:nowrap}
+.eyebrow.sys::after{content:"";flex:0 1 140px;height:1px;background:linear-gradient(90deg,var(--volt),transparent)}
+.final .eyebrow.sys{justify-content:center}
+/* card spotlight + top rail */
+.frame{position:relative}
+.frame::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(260px circle at var(--mx,-999px) var(--my,-999px),rgba(137,168,255,.12),transparent 60%)}
+.frame::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(137,168,255,.45),transparent);opacity:.0;transition:opacity .3s}
+.frame:hover::before{opacity:1}
+.cap h3,.layerc h3,.cls h3,.proto h3{color:transparent;background:var(--chrome);-webkit-background-clip:text;background-clip:text}
+/* reticle */
+.orbit{display:none}
+.reticle{position:absolute;inset:2%;pointer-events:none;z-index:0}
+.reticle svg{width:100%;height:100%;overflow:visible}
+.reticle .spin{transform-origin:50% 50%;animation:spin 80s linear infinite}
+.reticle .spin2{transform-origin:50% 50%;animation:spin 50s linear infinite reverse}
+.reticle text{font:500 9px var(--f-mono);letter-spacing:.14em;fill:var(--dim)}
+.robot-slot{z-index:1}
+@media (max-width:1000px){.hero{padding-top:96px}.hudstrip .hide-md{display:none}}
+@media (max-width:640px){.hudstrip .hide-sm{display:none}.hudstrip .wrap{gap:14px}}
+
+/* Command arc over the robot's head */
+.arc{position:absolute;inset:0;z-index:3;pointer-events:none}
+.arc-line{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.arc-line path{stroke:rgba(137,168,255,.35);stroke-width:1.2;vector-effect:non-scaling-stroke;stroke-dasharray:3 6;animation:dash 6s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-90}}
+.arc button{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;border:0;padding:0;background:none;cursor:pointer;color:var(--text);filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));transition:filter .3s,color .3s}
+.arc .pnl{display:grid;justify-items:center;gap:5px;width:88px;padding:11px 6px 9px;background:linear-gradient(180deg,rgba(18,26,50,.92),rgba(7,11,22,.92));box-shadow:inset 0 0 0 1px var(--line-2),inset 0 1px 0 rgba(255,255,255,.06);clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px);animation:panelIn .7s cubic-bezier(.2,.9,.3,1.2) backwards,float 4.2s ease-in-out infinite;animation-delay:calc(var(--i)*90ms),calc(var(--i)*-0.7s);transition:background .3s,box-shadow .3s,transform .2s}
+@keyframes panelIn{from{opacity:0;transform:translateY(24px) scale(.7)}}
+@keyframes float{50%{transform:translateY(-6px)}}
+.arc svg:not(.arc-line){width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6}
+.arc b{font:600 9.5px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--silver)}
+.arc small{font:500 8px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.arc button:hover{color:var(--volt-hi);filter:drop-shadow(0 0 14px rgba(77,124,255,.45))}
+.arc button:hover .pnl{box-shadow:inset 0 0 0 1px rgba(137,168,255,.6),inset 0 1px 0 rgba(255,255,255,.08)}
+.arc button[aria-pressed="true"]{color:#fff;filter:drop-shadow(0 0 18px rgba(77,124,255,.7))}
+.arc button[aria-pressed="true"] .pnl{background:linear-gradient(180deg,#5f88ff,#2f55d8);box-shadow:inset 0 0 0 1px rgba(200,215,255,.7)}
+.arc button[aria-pressed="true"] small{color:rgba(255,255,255,.75)}
+.arc button[data-mood="alert"][aria-pressed="true"]{filter:drop-shadow(0 0 18px rgba(255,79,160,.7))}
+.arc button[data-mood="alert"][aria-pressed="true"] .pnl{background:linear-gradient(180deg,#ff6fb1,#c92f7a)}
+.arc button[data-mood="standby"][aria-pressed="true"]{filter:none}
+.arc button[data-mood="standby"][aria-pressed="true"] .pnl{background:linear-gradient(180deg,#2a3248,#151b2c)}
+.arc button.ping .pnl{transform:scale(.9)}
+.arc button::after{content:"";position:absolute;inset:-6px;border:1px solid var(--volt-hi);opacity:0;pointer-events:none}
+.arc button.ping::after{animation:ping .6s ease-out}
+@keyframes ping{from{opacity:.9;transform:scale(.9)}to{opacity:0;transform:scale(1.35)}}
+.arc button:focus-visible{outline:none}
+.arc button:focus-visible .pnl{box-shadow:inset 0 0 0 2px var(--volt-hi)}
+@media (max-width:640px){.arc .pnl{width:58px;padding:8px 3px 7px;gap:4px}.arc small{display:none}.arc b{font-size:7.5px;letter-spacing:.08em}.arc svg:not(.arc-line){width:15px;height:15px}.hero-stage2 .stagebox{margin-top:30px}.hero-stage2{margin-top:84px}}
+
+/* Hide every scrollbar; scrolling still works (wheel, touch, keyboard) */
+html,body,*{scrollbar-width:none;-ms-overflow-style:none}
+*::-webkit-scrollbar{width:0;height:0;display:none}
+
+/* Robot economy / NVDA */
+.pai{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:16px}
+.pai-card{padding:28px;border:1px solid var(--line);display:flex;flex-direction:column;gap:14px;min-width:0}
+.pai-k{font:clamp(44px,5vw,64px)/1 var(--f-display);color:transparent;background:linear-gradient(180deg,#d8ff9a,#76b900 60%,#4a7a00);-webkit-background-clip:text;background-clip:text;letter-spacing:.04em}
+.pai-sub{font:500 12px/1.4 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.pai-t{font:18px/1.2 var(--f-display);color:var(--silver);letter-spacing:.03em}
+.pai-rows{display:grid;gap:10px;margin-top:6px;font-size:14px}
+.pai-rows div{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:10px}
+.pai-rows span{color:var(--dim)}.pai-rows b{color:var(--silver);font-weight:600;text-align:right}
+.pai-steps,.pai-why{margin:0;padding-left:20px;display:grid;gap:10px;font-size:14.5px}
+.pai-steps b,.pai-why b{color:var(--silver)}
+@media (max-width:1000px){.pai{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+<div class="backdrop" aria-hidden="true">
+  <div class="layer l-glow" data-speed="0.08"></div>
+  <div class="layer l-grid" data-speed="0.2"></div>
+  <canvas id="dust"></canvas>
+</div>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="#top"><svg class="logo-mark" viewBox="40 145 1178 1022" aria-hidden="true"><g fill="currentColor"><polygon points="70,175 428,175 708,455 708,560 595,447 275,447 70,252"/><polygon points="1100,175 1188,175 1188,495 905,770 520,770 400,885 400,1137 70,1137 70,860 375,563 710,563"/><polygon points="525,780 645,885 975,885 1188,1080 1188,1137 790,1137 525,872"/></g></svg><b>KX-9</b></a>
+    <ul>
+      <li><a href="#capabilities">Capabilities</a></li>
+      <li><a href="#anatomy">Unit</a></li>
+      <li><a href="#crew">Crew</a></li>
+      <li><a href="#physical">Physical AI</a></li>
+      <li><a href="#passport">Passport</a></li>
+      <li><a href="#flagship">Flagship</a></li>
+      <li><a href="#token">$KX9</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="docs.html">Docs</a></li>
+    </ul>
+    <span class="sp"></span>
+    <a class="btn ghost" href="#flagship">Flagship Unit</a>
+    <a class="btn primary" href="https://app.kx9.tech/">Launch App</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero" id="intro">
+    <div class="wrap">
+      <div class="hero-head" data-fade>
+        <span class="status"><i></i>Unit KX-9-0001 · Online · Robinhood Chain</span>
+        <h1><span>Deploy your</span><span><em>Robotic Agent</em></span><span>On-chain</span></h1>
+        <p class="lede">Robots will hold wallets. KX-9 is their financial brain: an autonomous unit that trades tokenized stocks and crypto on Robinhood Chain, with an ERC-8004 passport, a public Black Box and hard limits written on-chain.</p>
+        <div class="ctas">
+          <a class="btn primary" href="https://app.kx9.tech/">Launch App <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn" href="#anatomy">Inspect the unit</a>
+        </div>
+      </div>
+      <div class="hero-stage2">
+        <div class="rot left" data-par="-0.1">
+          <div class="rotp frame"><span class="lab">Scanning</span><span class="val" data-cycle="NVDA · TSLA · ETH|PLTR · AAPL · AMZN|Robinhood Chain feeds">NVDA · TSLA · ETH</span><span class="bar"><i></i></span></div>
+          <div class="rotp frame"><span class="lab">Risk check</span><span class="val" data-cycle="4 / 4 limits passed|Max per trade $500|Slippage 0.21%">4 / 4 limits passed</span><span class="bar"><i></i></span></div>
+        </div>
+        <div class="stagebox" data-par="0.08">
+          <div class="halo"></div>
+          <div class="orbit"></div><div class="orbit o2"></div><div class="reticle" id="reticle" aria-hidden="true"></div>
+          <div class="robot-slot" id="heroBot"></div>
+          <div class="arc" role="group" aria-label="Command the unit">
+            <svg class="arc-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path id="arcPath" d="" fill="none"/></svg>
+            <button data-mood="idle" aria-pressed="true" style="--i:0"><span class="pnl"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M9.5 10v3M14.5 10v3"/></svg><b>Idle</b><small>Hold</small></span></button><button data-mood="scan" aria-pressed="false" style="--i:1"><span class="pnl"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 18 0"/><path d="M12 12l6-5"/><circle cx="12" cy="12" r="1.5"/></svg><b>Scan</b><small>Sensors</small></span></button><button data-mood="think" aria-pressed="false" style="--i:2"><span class="pnl"><svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></svg><b>Process</b><small>Core</small></span></button><button data-mood="alert" aria-pressed="false" style="--i:3"><span class="pnl"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4.4-3 7.8-7 9.5-4-1.7-7-5.1-7-9.5V6z"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg><b>Veto</b><small>Shield</small></span></button><button data-mood="happy" aria-pressed="false" style="--i:4"><span class="pnl"><svg viewBox="0 0 24 24"><path d="M5 12h11M12 7l5 5-5 5"/><path d="M20 5v14"/></svg><b>Execute</b><small>Actuator</small></span></button><button data-mood="standby" aria-pressed="false" style="--i:5"><span class="pnl"><svg viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.3 7.5a8 8 0 1 0 11.4 0"/></svg><b>Standby</b><small>Power</small></span></button>
+          </div>
+        </div>
+        <div class="rot right" data-par="-0.1">
+          <div class="rotp frame"><span class="lab">Executing on</span><span class="val" data-cycle="Robinhood Chain|Arbitrum Orbit L2|Shield contract">Robinhood Chain</span><span class="bar"><i></i></span></div>
+          <div class="rotp frame"><span class="lab">Recording to</span><span class="val" data-cycle="Black Box|ERC-8004 registry|Validation record">Black Box</span><span class="bar"><i></i></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="ticker">
+      <span>Chain <b>Robinhood Chain</b></span><span>Standard <b>ERC-8004</b></span><span>Modules <b>5</b></span><span>Crew <b>Analyst · Risk · Executor</b></span><span>Protocols <b>Accumulate · Balance · Guard · Trend · Physical AI</b></span><span>Stock token <b>NVDA</b></span><span>Launch <b>Fair · No presale</b></span><span>Liquidity <b>Locked</b></span>
+      <span>Chain <b>Robinhood Chain</b></span><span>Standard <b>ERC-8004</b></span><span>Modules <b>5</b></span><span>Crew <b>Analyst · Risk · Executor</b></span><span>Protocols <b>Accumulate · Balance · Guard · Trend · Physical AI</b></span><span>Stock token <b>NVDA</b></span><span>Launch <b>Fair · No presale</b></span><span>Liquidity <b>Locked</b></span>
+    </div>
+  </div>
+
+  <!-- CAPABILITIES -->
+  <section class="block" id="capabilities">
+    <div class="wrap">
+      <div class="sec-head focus"><span class="eyebrow">Capabilities</span><h2>One unit. Nine systems.</h2><p>Everything a robot needs to manage capital on its own, and everything you need to keep it in check.</p></div>
+      <div class="caps"><div class="cap frame focus"><svg class="ico" viewBox="0 0 24 24"><path d="M4 17l5-5 4 3 7-8"/><path d="M15 7h5v5"/></svg><span class="no">01</span><h3>Autonomous trading</h3><p>Trade stock tokens and crypto on Robinhood Chain, around the clock, inside your rules.</p></div><div class="cap frame focus"><svg class="ico" viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5M11 20c0-3 2.5-5 5-5s5 2 5 5"/></svg><span class="no">02</span><h3>Command crew</h3><p>Analyst proposes, Risk Officer vetoes, Executor acts. No single AI makes the call.</p></div><div class="cap frame focus"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4.4-3 7.8-7 9.5-4-1.7-7-5.1-7-9.5V6z"/></svg><span class="no">03</span><h3>Shield limits</h3><p>Max per trade, daily cap, slippage and a whitelist, enforced by contract.</p></div><div class="cap frame focus"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M8 17h8"/></svg><span class="no">04</span><h3>ERC-8004 passport</h3><p>An on-chain identity with reputation and validation registries.</p></div><div class="cap frame focus"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 12.5h8M8 16h5"/></svg><span class="no">05</span><h3>Black Box</h3><p>Every proposal, veto and trade recorded with its reason.</p></div><div class="cap frame focus"><svg class="ico" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9.5A1.7 1.7 0 0 0 6.5 21h11a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/></svg><span class="no">06</span><h3>Simulation Chamber</h3><p>Test any protocol on historical data before it touches the chain.</p></div><div class="cap frame focus"><svg class="ico" viewBox="0 0 24 24"><path d="M5 7h10M5 12h14M5 17h8"/><circle cx="18" cy="7" r="2"/></svg><span class="no">07</span><h3>Trading protocols</h3><p>Accumulate, Balance, Guard, Trend and Physical AI. Rules, not guesses.</p></div><div class="cap frame focus"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.3 7.5a8 8 0 1 0 11.4 0"/></svg><span class="no">08</span><h3>Kill switch</h3><p>Standby powers the unit down and halts everything in one tap.</p></div><div class="cap frame focus"><svg class="ico" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg><span class="no">09</span><h3>Mission reports</h3><p>A plain-English daily summary of what your unit did and why.</p></div></div>
+
+      <div class="gate" style="margin-top:110px">
+        <div class="sec-head focus" style="margin:0"><span class="eyebrow">The machine economy</span><h2>Your gateway to robots that hold capital.</h2><p>Agents are getting bodies, and bodies need a balance sheet. KX-9 is the financial module built as a machine you can see, inspect and audit.</p></div>
+        <div class="counters">
+          <div class="counter frame focus"><b data-count="5">5</b><span>Modules per unit</span></div>
+          <div class="counter frame focus"><b data-count="3">3</b><span>Agents in the crew</span></div>
+          <div class="counter frame focus"><b data-count="4">4</b><span>Trading protocols</span></div>
+          <div class="counter frame focus"><b data-count="0">0</b><span>Limits the AI can override</span></div>
+        </div>
+      </div>
+
+      <div class="built focus"><span class="lab">Built with</span><b>Robinhood Chain</b><b>Arbitrum Orbit</b><b>Ethereum</b><b>ERC-8004</b><b>Three.js</b></div>
+    </div>
+  </section>
+
+  <!-- ANATOMY -->
+  <section class="block" id="anatomy">
+    <div class="wrap">
+      <div class="sec-head focus"><span class="eyebrow">Anatomy of a unit</span><h2>Five modules. One machine.</h2><p>Data flows through a KX-9 unit in a fixed order, from what it senses to what it records. Scroll to walk the signal path.</p></div>
+      <div class="anatomy">
+        <div class="sticky-bot">
+          <i class="corner c1"></i><i class="corner c2"></i>
+          <div class="robot-slot" id="anaBot"></div>
+          <div class="readout"><span>Module · <b id="modName">Sensors</b></span><span>Visor · <b id="modMood">Scan</b></span></div>
+        </div>
+        <div class="mods" id="mods">
+          <div class="mod focus" data-mood="scan" data-name="Sensors"><span class="idx">01 / SENSORS</span><h3>It reads the market.</h3><p>Live prices for stock tokens and crypto on Robinhood Chain, plus your unit's balances and open positions.</p><ul><li>price feeds</li><li>wallet state</li><li>220 ms refresh</li></ul></div>
+          <div class="mod focus" data-mood="think" data-name="Core"><span class="idx">02 / CORE</span><h3>It thinks in a chain of command.</h3><p>The AI core runs three agents: an Analyst who proposes, a Risk Officer who checks, and an Executor who acts. Each explains its reasoning in plain English.</p><ul><li>analyst</li><li>risk officer</li><li>executor</li></ul></div>
+          <div class="mod focus" data-mood="alert" data-name="Shield"><span class="idx">03 / SHIELD</span><h3>It stops at the line.</h3><p>A guardrail contract enforces your limits before anything moves. A trade that breaks a rule is vetoed, logged and never sent.</p><ul><li>max per trade</li><li>daily cap</li><li>slippage</li><li>whitelist</li></ul></div>
+          <div class="mod focus" data-mood="happy" data-name="Actuator"><span class="idx">04 / ACTUATOR</span><h3>It simulates, then executes.</h3><p>Every approved trade is simulated first for price, fees and slippage. Only then does the Actuator send it on-chain.</p><ul><li>pre-trade simulation</li><li>on-chain execution</li></ul></div>
+          <div class="mod focus" data-mood="idle" data-name="Black Box"><span class="idx">05 / BLACK BOX</span><h3>It remembers everything.</h3><p>A flight recorder for capital. Every decision is stored with its reason, its Shield result and a validation record anyone can check.</p><ul><li>decision log</li><li>validation records</li><li>explorer links</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREW -->
+  <section class="block" id="crew">
+    <div class="wrap">
+      <div class="sec-head focus"><span class="eyebrow">Command crew</span><h2>No single AI makes the call.</h2><p>Decisions move through three specialist agents. The Risk Officer holds a veto, and in Supervised mode you hold the final signature.</p></div>
+      <div class="crew">
+        <div class="crew-card frame focus"><span class="role">Analyst</span><h3>Proposes</h3><p>Reads the protocols you've switched on and turns market data into a specific trade with a written reason.</p></div>
+        <div class="crew-card frame focus"><span class="role">Risk Officer</span><h3>Checks &amp; vetoes</h3><p>Tests every proposal against your Shield limits. One failed check and the proposal is blocked.</p></div>
+        <div class="crew-card frame focus"><span class="role">Executor</span><h3>Acts</h3><p>Simulates the approved trade, sends it on-chain and writes the result to the Black Box.</p></div>
+      </div>
+      <div class="cases">
+        <div class="case ok frame focus"><span class="verdict">✓ Approved</span><div class="line"><span>Analyst</span><p>Buy NVDA for $300. It sits 4.1% under its target weight.</p></div><div class="line"><span>Risk</span><p>Within $500 per trade and the daily cap. Slippage est. 0.21%.</p></div><div class="line"><span>Executor</span><p>Bought 1.64 NVDA tokens. Logged with validation record.</p></div></div>
+        <div class="case no frame focus"><span class="verdict">✕ Vetoed</span><div class="line"><span>Analyst</span><p>Buy PLTR for $900. Price held above its 20-day trend.</p></div><div class="line"><span>Risk</span><p>$900 exceeds the $500 max per trade. Proposal blocked.</p></div><div class="line"><span>Executor</span><p>Nothing sent. Veto written to the Black Box.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROTOCOLS & MODES -->
+  <section class="block" id="protocols">
+    <div class="wrap">
+      <div class="sec-head focus"><span class="eyebrow">Protocols &amp; modes</span><h2>Disciplined programs, under your control.</h2><p>Units run rule-based protocols instead of guessing. You decide how much freedom they get.</p></div>
+      <div class="split">
+        <div class="protos">
+          <div class="proto frame focus"><h3>Accumulate</h3><p>Buys a fixed amount of one asset on a schedule.</p><span class="risk">Risk · Low</span></div>
+          <div class="proto frame focus"><h3>Balance</h3><p>Rebalances when an asset drifts from its target weight.</p><span class="risk">Risk · Low</span></div>
+          <div class="proto frame focus"><h3>Guard</h3><p>Take-profit and stop-loss on every open position.</p><span class="risk">Risk · Medium</span></div>
+          <div class="proto frame focus"><h3>Trend</h3><p>Enters when price holds above its moving average.</p><span class="risk">Risk · High</span></div>
+          <div class="proto frame focus" style="grid-column:1/-1"><h3>Physical AI · NVDA</h3><p>Builds a position in the NVIDIA stock token on a schedule, with extra buys on dip days.</p><span class="risk">Risk · Medium</span></div>
+        </div>
+        <div class="modes">
+          <div class="mode focus"><i style="background:var(--volt);box-shadow:0 0 10px var(--volt)"></i><b>Supervised</b><span>The unit proposes. You approve every trade.</span></div>
+          <div class="mode focus"><i style="background:var(--signal);box-shadow:0 0 10px var(--signal)"></i><b>Autonomous</b><span>The unit trades by itself, only inside Shield limits.</span></div>
+          <div class="mode focus"><i style="background:var(--dim)"></i><b>Standby</b><span>The kill switch. One tap powers the unit down and halts everything.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROBOT ECONOMY -->
+  <section class="block" id="physical">
+    <div class="wrap">
+      <div class="sec-head focus"><span class="eyebrow">The robot economy</span><h2>The chips think. The units trade.</h2><p>NVIDIA builds the computers and software that many of today's robots run on. On Robinhood Chain, its stock trades as a token: NVDA. KX-9 units can build a position in it, inside your Shield limits.</p></div>
+      <div class="pai">
+        <div class="pai-card frame focus">
+          <span class="pai-k">NVDA</span>
+          <span class="pai-sub">NVIDIA stock token</span>
+          <div class="pai-rows">
+            <div><span>Chain</span><b>Robinhood Chain</b></div>
+            <div><span>Tracks</span><b>NVIDIA Corp. · NASDAQ: NVDA</b></div>
+            <div><span>Price feed</span><b>Chainlink · updates 24/5</b></div>
+            <div><span>In KX-9</span><b>Whitelisted by default</b></div>
+          </div>
+        </div>
+        <div class="pai-card frame focus">
+          <span class="pai-t">Physical AI protocol</span>
+          <ol class="pai-steps">
+            <li><b>Scheduled buys.</b> A fixed amount of NVDA every day, week or month.</li>
+            <li><b>Dip buys.</b> Adds more when NVDA falls past your trigger in a day.</li>
+            <li><b>Shield first.</b> Every buy passes max per trade, daily cap and slippage.</li>
+            <li><b>On the record.</b> Each run lands in the Black Box with its reason.</li>
+          </ol>
+        </div>
+        <div class="pai-card frame focus">
+          <span class="pai-t">Why NVIDIA</span>
+          <ul class="pai-why">
+            <li><b>Training.</b> Robot models learn on GPU compute.</li>
+            <li><b>Simulation.</b> Robots practise in virtual worlds before the real one.</li>
+            <li><b>On board.</b> Edge computers run the models inside the robot.</li>
+          </ul>
+          <span class="pai-sub" style="margin-top:auto">Robots need brains. Brains need compute. <a href="docs.html#compute" style="color:var(--volt-hi)">How KX-9 uses it →</a></span>
+        </div>
+      </div>
+      <p class="fine focus">KX-9 is not affiliated with, endorsed or sponsored by NVIDIA Corporation. NVIDIA and NVDA are named only to describe a stock token available on Robinhood Chain. Stock tokens track the underlying share price and may not be available in every country. Not financial advice.</p>
+    </div>
+  </section>
+
+  <!-- LAYERS -->
+  <section class="block" id="layers">
+    <div class="wrap">
+      <div class="sec-head focus"><span class="eyebrow">Ecosystem</span><h2>The stack behind every KX-9 unit.</h2><p>Four layers, from the chain it settles on to the token that switches it on.</p></div>
+      <div class="layers">
+        <div class="layerc frame focus"><span class="ln">LAYER 01</span><h3>Chain</h3><p>Robinhood Chain, an AI-native Ethereum Layer 2 on Arbitrum Orbit, home to tokenized stocks and on-chain agents.</p></div>
+        <div class="layerc frame focus"><span class="ln">LAYER 02</span><h3>Identity</h3><p>ERC-8004 registries give each unit a passport, a reputation score and validation records.</p></div>
+        <div class="layerc frame focus"><span class="ln">LAYER 03</span><h3>Unit</h3><p>Sensors, Core, Shield, Actuator and Black Box: the five modules that sense, decide, limit, act and record.</p></div>
+        <div class="layerc l4 frame focus"><span class="ln">LAYER 04</span><h3>Access · $KX9</h3><p>Hold $KX9 to activate a unit and unlock higher classes, more protocols and Autonomous mode.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASSPORT -->
+  <section class="block" id="passport">
+    <div class="wrap pass">
+      <div class="plate focus" data-par="-0.06">
+        <span class="spec">SPECIMEN</span>
+        <span class="eyebrow">ERC-8004 · Identity Registry</span>
+        <div class="serial">KX-9-0001</div>
+        <dl>
+          <div><dt>Agent ID</dt><dd>#0001</dd></div>
+          <div><dt>Chain</dt><dd>Robinhood Chain</dd></div>
+          <div><dt>Class</dt><dd>Mk II</dd></div>
+          <div><dt>Reputation</dt><dd>87 / 100</dd></div>
+          <div><dt>Validated actions</dt><dd>1,284</dd></div>
+          <div><dt>Shield breaches</dt><dd>0</dd></div>
+        </dl>
+      </div>
+      <div>
+        <div class="sec-head focus" style="margin-bottom:24px"><span class="eyebrow">Unit passport</span><h2>Every unit has a serial number. Every move has a record.</h2></div>
+        <div class="regs">
+          <div class="reg focus"><span class="n">ID</span><div><h3>Identity</h3><p>A unique on-chain passport with the unit's serial, operator and capabilities.</p></div></div>
+          <div class="reg focus"><span class="n">RP</span><div><h3>Reputation</h3><p>A public score built from the unit's verified history, so performance is shown, not claimed.</p></div></div>
+          <div class="reg focus"><span class="n">VL</span><div><h3>Validation</h3><p>Proof that each logged decision and Shield check actually happened.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLAGSHIP -->
+  <section class="block" id="flagship">
+    <div class="wrap">
+      <div class="sec-head focus"><span class="eyebrow">Flagship Unit</span><h2>Our own unit trades in public.</h2><p>KX-9-0001 runs with a fully open Black Box from launch day. Watch what it proposes, what gets vetoed and what it executes.</p></div>
+      <div class="flag">
+        <div class="panel frame focus">
+          <div class="panel-h"><h3>KX-9-0001 · portfolio, 30 days</h3><span class="chip">Preview data</span></div>
+          <div class="stats"><div><b>1,284</b><span>Actions</span></div><div><b>6.1%</b><span>Veto rate</span></div><div><b>0</b><span>Breaches</span></div></div>
+          <svg class="spark" id="spark" viewBox="0 0 600 150" preserveAspectRatio="none" aria-label="Flagship portfolio trend, preview data"></svg>
+        </div>
+        <div class="panel frame focus">
+          <div class="panel-h"><h3>Black Box · latest</h3><span class="chip">Preview data</span></div>
+          <div class="bb">
+            <div><time>09:59</time><span class="r ra">Analyst</span><p>Buy NVDA for $300. Under target weight.</p></div>
+            <div><time>09:59</time><span class="r rr">Risk</span><p>Approved. All four checks passed.</p></div>
+            <div><time>08:04</time><span class="r rr">Risk</span><p>Veto. PLTR $900 exceeds max per trade.</p></div>
+            <div><time>06:29</time><span class="r re">Executor</span><p>Sold 0.92 TSLA at Guard take-profit.</p></div>
+            <div><time>05:12</time><span class="r re">Executor</span><p>Bought 0.0415 ETH on Accumulate.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOKEN -->
+  <section class="block" id="token">
+    <div class="wrap">
+      <div class="sec-head focus"><span class="eyebrow">$KX9</span><h2>The key that activates your unit.</h2><p>Hold $KX9 to unlock unit classes. Higher classes get more freedom, more protocols and more units.</p></div>
+      <div class="classes">
+        <div class="cls frame focus"><h3>Observer</h3><span class="hold">Hold · 0</span><ul><li>Watch the Flagship Unit live</li><li>Read its full Black Box</li></ul></div>
+        <div class="cls frame focus"><h3>Mk I</h3><span class="hold">Hold · TBA</span><ul><li>One unit</li><li>Supervised mode</li><li>Accumulate &amp; Balance</li></ul></div>
+        <div class="cls feat frame focus"><h3>Mk II</h3><span class="hold">Hold · TBA</span><ul><li>Autonomous mode</li><li>All five protocols</li><li>Simulation Chamber</li></ul></div>
+        <div class="cls frame focus"><h3>Mk III</h3><span class="hold">Hold · TBA</span><ul><li>Multiple units</li><li>Custom Shield settings</li><li>Premium armor finishes</li></ul></div>
+      </div>
+      <p class="fine focus">Holding requirements are announced at launch. $KX9 is an access key to the KX-9 tool. It gives no claim on profits, revenue or buybacks.</p>
+    </div>
+  </section>
+
+  <!-- LAUNCH + ROADMAP -->
+  <section class="block" id="roadmap">
+    <div class="wrap launch">
+      <div>
+        <div class="sec-head focus" style="margin-bottom:24px"><span class="eyebrow">Launch</span><h2>Launched clean.</h2></div>
+        <div class="princ focus">
+          <div><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><p><b>Fair launch.</b> No presale, no private round.</p></div>
+          <div><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><p><b>Small team allocation,</b> disclosed and locked.</p></div>
+          <div><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><p><b>Liquidity locked,</b> with proof published.</p></div>
+          <div><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><p><b>Product live on day one.</b> The Flagship Unit trades from launch.</p></div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-head focus" style="margin-bottom:24px"><span class="eyebrow">Roadmap</span><h2>From digital units to machine treasury.</h2></div>
+        <div class="road">
+          <div class="phase frame focus"><span class="ph">PHASE 1</span><div><h3>Digital Units</h3><p>KX-9 units trade on Robinhood Chain with ERC-8004 passports, Shield limits and the Black Box.</p><span class="state" style="color:var(--ok)">In build</span></div></div>
+          <div class="phase frame focus"><span class="ph">PHASE 2</span><div><h3>Unit Reputation</h3><p>Public rankings of units based on their verified records.</p><span class="state" style="color:var(--dim)">Next</span></div></div>
+          <div class="phase frame focus"><span class="ph">PHASE 3</span><div><h3>Machine Treasury</h3><p>KX-9 as the wallet and treasury module other agents and physical robots can plug into.</p><span class="state" style="color:var(--dim)">Vision</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="block" id="faq">
+    <div class="wrap">
+      <div class="sec-head focus"><span class="eyebrow">Questions</span><h2>Before you deploy.</h2></div>
+      <div class="faq focus">
+        <details><summary>Can the AI move more money than I allow?</summary><p>No. The Shield contract checks every trade against your limits before it's sent. The AI core has no way to change those limits. Only your signature can.</p></details>
+        <details><summary>Do I need to approve every trade?</summary><p>In Supervised mode, yes. In Autonomous mode the unit trades by itself, but only inside your Shield limits. Standby stops everything at once.</p></details>
+        <details><summary>What can a unit trade?</summary><p>Assets on Robinhood Chain that you add to its whitelist, such as stock tokens and crypto. Availability of stock tokens may depend on your country.</p></details>
+        <details><summary>Is KX-9 affiliated with Robinhood?</summary><p>No. KX-9 is an independent project built on Robinhood Chain, a public blockchain. It is not made, endorsed or operated by Robinhood Markets.</p></details>
+        <details><summary>Will my unit make money?</summary><p>There's no guarantee. Units follow rules, but markets move and AI can make mistakes. Start small and treat this as a tool, not a promise.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+  <section class="block">
+    <div class="wrap final focus">
+      <span class="eyebrow">KX-9-0001 is waiting</span>
+      <h2>Built like a machine. Trades like one.</h2>
+      <p>Open the command app to inspect a unit, test protocols in the Simulation Chamber and walk through a live decision.</p>
+      <a class="btn primary" href="https://app.kx9.tech/">Launch App <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div><a class="logo" href="#top"><svg class="logo-mark" viewBox="40 145 1178 1022" aria-hidden="true"><g fill="currentColor"><polygon points="70,175 428,175 708,455 708,560 595,447 275,447 70,252"/><polygon points="1100,175 1188,175 1188,495 905,770 520,770 400,885 400,1137 70,1137 70,860 375,563 710,563"/><polygon points="525,780 645,885 975,885 1188,1080 1188,1137 790,1137 525,872"/></g></svg><b>KX-9</b></a><p style="margin-top:14px">The financial brain for the robot economy.</p></div>
+      <div><h4>Product</h4><ul><li><a href="https://app.kx9.tech/" target="_blank" rel="noopener">Command app</a></li><li><a href="#flagship">Flagship Unit</a></li><li><a href="#capabilities">Capabilities</a></li></ul></div>
+      <div><h4>Unit</h4><ul><li><a href="#anatomy">Anatomy</a></li><li><a href="#crew">Command crew</a></li><li><a href="#passport">Passport</a></li></ul></div>
+      <div><h4>$KX9</h4><ul><li><a href="#token">Unit classes</a></li><li><a href="#roadmap">Launch &amp; roadmap</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+      <div><h4>Resources</h4><ul><li><a href="docs.html">Docs</a></li><li><a href="docs.html#api">API reference</a></li><li><a href="terms.html">Terms of Service</a></li><li><a href="privacy.html">Privacy Policy</a></li><li><a href="risk.html">Risk Disclosure</a></li></ul></div>
+    </div>
+  </div>
+  <div class="hudstrip" aria-label="System status"><div class="wrap"><span><span class="ok">●</span> SYS <b>Online</b></span><span class="hide-sm">Net <b>Robinhood Chain</b></span><span class="hide-md">Registry <b>ERC-8004</b></span><span class="hide-md">Shield <b>Armed</b></span><span class="sp"></span><span>UTC <b id="utc">--:--:--</b></span></div></div>
+<div class="kx9-project-links" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;padding:20px 24px;font-size:12px;border-top:1px solid rgba(150,170,220,.16)"><a href="https://github.com/kx9-dev" target="_blank" rel="noopener noreferrer">GitHub · kx9-dev</a><a href="mailto:dev@kx9.tech">dev@kx9.tech</a></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="robot.js"></script>
+<script>
+(function(){
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* robots */
+const hero=window.KX9?KX9.create($('#heroBot'),{distance:7.4}):null;
+const ana=window.KX9?KX9.create($('#anaBot'),{distance:6.6,mood:'scan'}):null;
+const arcBtns=$$('.arc button'),ARC={cx:50,cy:50,r:47,a0:-162,a1:-18};
+function layoutArc(){const n=arcBtns.length;let d='';
+  arcBtns.forEach((b,i)=>{const a=(ARC.a0+(ARC.a1-ARC.a0)*i/(n-1))*Math.PI/180;b.dataset.ax=Math.cos(a).toFixed(3);b.dataset.ay=Math.sin(a).toFixed(3);
+    b.style.left=(ARC.cx+Math.cos(a)*ARC.r)+'%';b.style.top=(ARC.cy+Math.sin(a)*ARC.r)+'%'});
+  for(let k=0;k<=40;k++){const a=(ARC.a0-6+(ARC.a1-ARC.a0+12)*k/40)*Math.PI/180;d+=(k?'L':'M')+(ARC.cx+Math.cos(a)*ARC.r).toFixed(2)+' '+(ARC.cy+Math.sin(a)*ARC.r).toFixed(2)}
+  $('#arcPath').setAttribute('d',d)}
+layoutArc();
+arcBtns.forEach(b=>b.addEventListener('click',()=>{
+  arcBtns.forEach(x=>x.setAttribute('aria-pressed',x===b));
+  b.classList.remove('ping');void b.offsetWidth;b.classList.add('ping');
+  if(hero){hero.setMood(b.dataset.mood);hero.look(+b.dataset.ax,+b.dataset.ay,1100);if(b.dataset.mood==='happy')hero.pulse();}
+}));
+
+/* dust particles (parallax depth) */
+const cv=$('#dust'),cx=cv.getContext('2d');let P=[],W=0,H=0;
+function sizeDust(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);
+  P=Array.from({length:Math.round(Math.min(90,W/14))},()=>({x:Math.random()*W,y:Math.random()*H*3,z:.2+Math.random()*.8,r:Math.random()*1.4+.3}))}
+sizeDust();addEventListener('resize',sizeDust);
+
+/* sparkline */
+(function(){let v=100,d=[];for(let i=0;i<40;i++){v*=1+(Math.sin(i*1.7)*.5+Math.cos(i*.6)*.6+.25)*.012;d.push(v)}
+  const mn=Math.min(...d)*.995,mx=Math.max(...d)*1.005,X=i=>i/39*600,Y=v=>150-(v-mn)/(mx-mn)*140-5;
+  const pts=d.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ');
+  $('#spark').innerHTML=`<defs><linearGradient id="sg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4d7cff" stop-opacity=".35"/><stop offset="1" stop-color="#4d7cff" stop-opacity="0"/></linearGradient></defs>`+
+  [0,1,2,3].map(i=>`<line x1="0" x2="600" y1="${5+i*46.6}" y2="${5+i*46.6}" stroke="rgba(130,160,255,.1)" vector-effect="non-scaling-stroke"/>`).join('')+
+  `<polygon points="0,150 ${pts} 600,150" fill="url(#sg)"/><polyline points="${pts}" fill="none" stroke="#4d7cff" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;})();
+
+/* scroll engine: parallax + blur focus */
+const nav=$('#nav'),layers=$$('.layer[data-speed]'),pars=$$('[data-par]'),focusEls=$$('.focus'),mods=$$('.mod'),fade=$('[data-fade]'),ticker=$('#ticker');
+let sy=scrollY,ty=scrollY,curMod=null;
+function tick(){
+  ty=scrollY; sy+= (ty-sy)*(reduce?1:.14);
+  const vh=innerHeight;
+  nav.classList.toggle('solid',ty>30);
+  if(!reduce){
+    layers.forEach(l=>{const sp=+l.dataset.speed;
+      if(l.classList.contains('l-grid'))l.style.backgroundPosition=`0 ${(-sy*sp)%64}px`;
+      else l.style.transform=`translate3d(${(Math.cos(sy/1700)*vh*.05).toFixed(1)}px,${(Math.sin(sy/1300)*vh*.1).toFixed(1)}px,0)`;});
+    pars.forEach(el=>{const r=el.getBoundingClientRect();const c=r.top+r.height/2-vh/2;el.style.transform=`translate3d(0,${(c*-+el.dataset.par).toFixed(1)}px,0)`});
+    // blur focus: sharp near viewport centre, blurred toward edges
+    focusEls.forEach(el=>{
+      const r=el.getBoundingClientRect();if(r.bottom<-200||r.top>vh+200)return;
+      const c=r.top+Math.min(r.height,vh)/2;const d=Math.abs(c-vh*.5)/(vh*.5);
+      const k=Math.max(0,Math.min(1,(d-.55)/.45));
+      el.style.filter=k>0.01?`blur(${(k*12).toFixed(1)}px)`:'none';
+      el.style.opacity=(1-k*.7).toFixed(3);
+      el.style.transform=el.dataset.par?el.style.transform:`translate3d(0,${(k*(c>vh*.5?36:-24)).toFixed(1)}px,0) scale(${(1-k*.03).toFixed(3)})`;
+    });
+    // hero copy blurs out as you leave
+    const hb=Math.min(1,Math.max(0,sy/(vh*.7)));
+    fade.style.filter=hb>0.02?`blur(${(hb*10).toFixed(1)}px)`:'none';fade.style.opacity=(1-hb*.85).toFixed(3);
+  }
+  // dust
+  cx.clearRect(0,0,W,H);
+  P.forEach(p=>{let y=(p.y-sy*p.z*.6)%(H*1.2);if(y<-10)y+=H*1.2;cx.globalAlpha=.25+p.z*.5;cx.fillStyle=p.z>.7?'#89a8ff':'#5d6a85';cx.beginPath();cx.arc(p.x,y,p.r*p.z+.2,0,6.283);cx.fill()});
+  // anatomy: module nearest centre drives the sticky robot
+  let best=null,bd=1e9;mods.forEach(m=>{const r=m.getBoundingClientRect();const dd=Math.abs(r.top+r.height/2-vh*.55);if(dd<bd){bd=dd;best=m}});
+  if(best&&best!==curMod){curMod=best;mods.forEach(m=>m.classList.toggle('on',m===best));ana&&ana.setMood(best.dataset.mood);if(best.dataset.mood==='happy'&&ana)ana.pulse();
+    $('#modName').textContent=best.dataset.name;$('#modMood').textContent={scan:'Scan',think:'Process',alert:'Veto',happy:'Execute',idle:'Record'}[best.dataset.mood];}
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+/* rotating panels with scramble */
+const GL='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#/·';
+$$('[data-cycle]').forEach((el,ix)=>{const items=el.dataset.cycle.split('|');let n=0;
+  setInterval(()=>{n=(n+1)%items.length;const target=items[n];let f=0;const iv=setInterval(()=>{f++;
+    el.textContent=target.split('').map((c,i)=>i<f*1.6||c===' '?c:GL[Math.random()*GL.length|0]).join('');if(f*1.6>=target.length){clearInterval(iv);el.textContent=target}},34)},2800+ix*450)});
+/* counters */
+const cio=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target,to=+el.dataset.count;cio.unobserve(el);if(reduce||to===0)return;let t0=null;
+  const st=ts=>{t0=t0||ts;const k=Math.min(1,(ts-t0)/1100);el.textContent=Math.round(to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(st)};el.textContent='0';requestAnimationFrame(st)}),{threshold:.6});
+$$('[data-count]').forEach(el=>cio.observe(el));
+/* jump bar active state */
+const jl=$$('#jump a'),secs=jl.map(a=>document.querySelector(a.getAttribute('href')));
+function jumpTick(){let on=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<innerHeight*.4)on=i});jl.forEach((a,i)=>a.classList.toggle('on',i===on));
+  const a=jl[on];const nv=$('#jump');if(a&&nv.scrollWidth>nv.clientWidth){const l=a.offsetLeft-nv.clientWidth/2+a.offsetWidth/2;if(Math.abs(nv.scrollLeft-l)>40)nv.scrollLeft=l}}
+addEventListener('scroll',jumpTick,{passive:true});jumpTick();
+
+/* utc clock */
+const utc=$('#utc');setInterval(()=>{utc.textContent=new Date().toISOString().slice(11,19)},1000);utc.textContent=new Date().toISOString().slice(11,19);
+/* section system labels */
+$$('.sec-head .eyebrow, .final .eyebrow').forEach((e,i)=>{e.classList.add('sys');e.innerHTML=`<span class="code">SYS.${String(i+1).padStart(2,'0')} //</span><span>${e.textContent}</span>`});
+/* reticle */
+(function(){let t='';for(let i=0;i<120;i++){const a=i/120*Math.PI*2,l=i%10===0?14:i%5===0?8:4,r1=200,r2=r1-l;t+=`<line x1="${(250+Math.cos(a)*r1).toFixed(1)}" y1="${(250+Math.sin(a)*r1).toFixed(1)}" x2="${(250+Math.cos(a)*r2).toFixed(1)}" y2="${(250+Math.sin(a)*r2).toFixed(1)}" stroke="rgba(137,168,255,${i%10===0?.55:.22})" stroke-width="1"/>`}
+  const arcs=[0,90,180,270].map(d=>{const a0=(d-28)*Math.PI/180,a1=(d+28)*Math.PI/180,r=222;return `<path d="M${250+Math.cos(a0)*r} ${250+Math.sin(a0)*r} A${r} ${r} 0 0 1 ${250+Math.cos(a1)*r} ${250+Math.sin(a1)*r}" fill="none" stroke="rgba(77,124,255,.5)" stroke-width="1.5"/>`}).join('');
+  $('#reticle').innerHTML=`<svg viewBox="0 0 500 500"><g class="spin">${t}</g><g class="spin2">${arcs}</g>
+  <circle cx="250" cy="250" r="236" fill="none" stroke="rgba(137,168,255,.10)"/>
+  <path d="M250 4v22M250 474v22M4 250h22M474 250h22" stroke="rgba(137,168,255,.5)"/>
+  <text x="262" y="20">AZ 000.0</text><text x="262" y="492">EL −12.4</text><text x="14" y="242">X −1.00</text><text x="440" y="242">Y +0.42</text></svg>`;})();
+/* card spotlight */
+document.addEventListener('pointermove',e=>{const f=e.target.closest&&e.target.closest('.frame');if(!f)return;const r=f.getBoundingClientRect();f.style.setProperty('--mx',(e.clientX-r.left)+'px');f.style.setProperty('--my',(e.clientY-r.top)+'px')},{passive:true});
+
+})();
+</script>
+
+</html>

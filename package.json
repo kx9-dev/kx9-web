@@ -1,0 +1,42 @@
+{
+  "name": "@kx9-dev/web",
+  "version": "0.1.0",
+  "description": "KX-9 landing page and wallet-connected Command app for Robinhood mainnet.",
+  "type": "module",
+  "license": "MIT",
+  "author": "KX-9 contributors <dev@kx9.tech>",
+  "homepage": "https://app.kx9.tech",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kx9-dev/kx9-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kx9-dev/kx9-web/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "kx9",
+    "web3",
+    "trading",
+    "ethereum",
+    "frontend"
+  ],
+  "files": [
+    "public",
+    "scripts",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "dev": "node scripts/serve.mjs --dev",
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

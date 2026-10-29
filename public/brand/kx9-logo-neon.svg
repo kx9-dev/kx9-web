@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="nRing" x1="0" y1="0.2" x2="1" y2="0.8">
+      <stop offset="0" stop-color="#5fc8ff"/><stop offset="0.35" stop-color="#4d7cff"/><stop offset="0.65" stop-color="#8a6bff"/><stop offset="1" stop-color="#ff4fa0"/>
+    </linearGradient>
+    <linearGradient id="nVisor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5fc8ff"/><stop offset="0.45" stop-color="#7a7dff"/><stop offset="1" stop-color="#ff4fa0"/>
+    </linearGradient>
+    <linearGradient id="nLeft" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fc8ff"/><stop offset="1" stop-color="#4d7cff"/></linearGradient>
+    <linearGradient id="nRight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c85cff"/><stop offset="1" stop-color="#ff4fa0"/></linearGradient>
+    <linearGradient id="nLeg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#89a8ff"/><stop offset="1" stop-color="#e4eaf5"/></linearGradient>
+    <filter id="nGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#nGlow)">
+    <!-- legs -->
+    <rect x="86" y="186" width="13" height="20" rx="3" fill="url(#nLeg)"/>
+    <rect x="141" y="186" width="13" height="20" rx="3" fill="url(#nLeg)"/>
+    <ellipse cx="88" cy="211" rx="21" ry="12" fill="#07080f" stroke="#4d7cff" stroke-width="3"/>
+    <ellipse cx="152" cy="211" rx="21" ry="12" fill="#07080f" stroke="#ff4fa0" stroke-width="3"/>
+    <path d="M80 210 L92 214" stroke="#5fc8ff" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M160 210 L148 214" stroke="#ff4fa0" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- ears -->
+    <rect x="26" y="96" width="22" height="44" rx="10" fill="#eef2ff" stroke="#4d7cff" stroke-width="3"/>
+    <rect x="192" y="96" width="22" height="44" rx="10" fill="#fff0f7" stroke="#ff4fa0" stroke-width="3"/>
+    <!-- head -->
+    <ellipse cx="120" cy="115" rx="80" ry="77" fill="#05060c" stroke="url(#nRing)" stroke-width="4"/>
+    <!-- top highlight -->
+    <path d="M88 52 Q120 40 152 52" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round"/>
+    <!-- side arcs -->
+    <path d="M68 72 Q46 108 58 154" fill="none" stroke="url(#nLeft)" stroke-width="9" stroke-linecap="round"/>
+    <path d="M172 72 Q194 108 182 154" fill="none" stroke="url(#nRight)" stroke-width="9" stroke-linecap="round"/>
+    <!-- visor -->
+    <rect x="74" y="78" width="92" height="84" rx="28" fill="#020308" stroke="url(#nVisor)" stroke-width="6"/>
+    <!-- eyes -->
+    <rect x="95" y="105" width="17" height="34" rx="8.5" fill="#ffffff"/>
+    <rect x="128" y="105" width="17" height="34" rx="8.5" fill="#ffffff"/>
+  </g>
+  <!-- glass glint -->
+  <path d="M83 112 Q83 88 106 86 L97 107 Z" fill="#ffffff" opacity="0.14"/>
+</svg>

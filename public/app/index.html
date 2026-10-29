@@ -1,0 +1,1493 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="canonical" href="https://app.kx9.tech/">
+<title>KX-9 Command</title>
+<meta name="description" content="Connect your wallet, review on-chain unit status and manage Shield limits. The command app for autonomous trading units on Robinhood Chain.">
+<meta name="theme-color" content="#04050b">
+<meta name="application-name" content="KX-9">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KX-9">
+<meta property="og:title" content="KX-9 Command · Control your robot unit">
+<meta property="og:description" content="Connect your wallet, review on-chain unit status and manage Shield limits. The command app for autonomous trading units on Robinhood Chain.">
+<meta property="og:url" content="https://kx9.tech/app">
+<meta property="og:image" content="https://app.kx9.tech/og-app.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="KX-9 Command app showing portfolio value, Shield cap and a trade waiting for approval">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="KX-9 Command · Control your robot unit">
+<meta name="twitter:description" content="Connect your wallet, review on-chain unit status and manage Shield limits. The command app for autonomous trading units on Robinhood Chain.">
+<meta name="twitter:image" content="https://app.kx9.tech/og-app.png">
+<meta name="twitter:image:alt" content="KX-9 Command app showing portfolio value, Shield cap and a trade waiting for approval">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%201254%201254%22%3E%3Crect%20width%3D%221254%22%20height%3D%221254%22%20rx%3D%22240%22%20fill%3D%22%23000%22/%3E%3Cg%20transform%3D%22translate%28627%20627%29%20scale%280.78%29%20translate%28-629%20-656%29%22%20fill%3D%22%23008cff%22%3E%3Cpolygon%20points%3D%2270%2C175%20428%2C175%20708%2C455%20708%2C560%20595%2C447%20275%2C447%2070%2C252%22/%3E%3Cpolygon%20points%3D%221100%2C175%201188%2C175%201188%2C495%20905%2C770%20520%2C770%20400%2C885%20400%2C1137%2070%2C1137%2070%2C860%20375%2C563%20710%2C563%22/%3E%3Cpolygon%20points%3D%22525%2C780%20645%2C885%20975%2C885%201188%2C1080%201188%2C1137%20790%2C1137%20525%2C872%22/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: fixed command rail + scrolling workspace; one-column stack with bottom tab bar under 860px. Single deliberate dark look. */
+:root{
+  --bg:#060810; --panel:#0b1020; --panel-2:#10172b; --well:#070b16;
+  --line:rgba(130,160,255,.13); --line-2:rgba(130,160,255,.26);
+  --silver:#e2e8f3; --text:#aab4c8; --dim:#67728a;
+  --volt:#4d7cff; --volt-hi:#86a6ff; --volt-soft:rgba(77,124,255,.14);
+  --signal:#ff4fa0; --signal-soft:rgba(255,79,160,.14);
+  --ok:#37d39a; --ok-soft:rgba(55,211,154,.13);
+  --warn:#ffb547; --warn-soft:rgba(255,181,71,.13);
+  --crit:#ff5c6c; --crit-soft:rgba(255,92,108,.13);
+  --f-display:"Michroma","Eurostile","Arial Black",sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:14px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font:14px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:50;background:var(--bg)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--volt-hi);outline-offset:2px;border-radius:6px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;color:var(--silver);font-weight:600;text-wrap:balance}
+.eyebrow{font:500 10.5px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100%}
+.rail{position:sticky;top:0;height:100vh;height:100dvh;border-right:1px solid var(--line);background:linear-gradient(180deg,#080c18,#060810);display:flex;flex-direction:column;padding:22px 14px 18px;gap:22px}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px}
+.brand-mark{width:32px;height:28px;color:#f2f5fb;filter:drop-shadow(0 0 10px rgba(0,140,255,.45));flex:none}
+.brand-name{font:15px/1 var(--f-display);color:var(--silver);letter-spacing:.06em}
+.brand-sub{font:10px/1 var(--f-mono);color:var(--dim);letter-spacing:.12em;margin-top:5px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:10px;color:var(--text);text-decoration:none;font-weight:500;border:1px solid transparent}
+.nav a svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;opacity:.8}
+.nav a:hover{background:rgba(130,160,255,.06);color:var(--silver)}
+.nav a[aria-current="page"]{background:var(--volt-soft);border-color:rgba(77,124,255,.3);color:var(--silver)}
+.nav a[aria-current="page"] svg{stroke:var(--volt-hi);opacity:1}
+.rail-foot{margin-top:auto;display:grid;gap:10px;padding:0 6px}
+.class-chip{border:1px solid var(--line-2);border-radius:12px;padding:12px;background:var(--panel)}
+.class-chip b{display:block;font:12px/1.2 var(--f-display);color:var(--silver);letter-spacing:.05em;margin-top:6px}
+.class-chip small{color:var(--dim);font-size:12px}
+.disclaim{font-size:11px;color:var(--dim);line-height:1.45}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px max(24px,env(safe-area-inset-right,0px)) 14px 24px;background:rgba(6,8,16,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.unit-id{display:flex;align-items:center;gap:10px;min-width:0}
+.unit-id .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.unit-id .dot.standby{background:var(--dim);box-shadow:none}
+.unit-id b{font:13px/1 var(--f-display);color:var(--silver);letter-spacing:.06em}
+.unit-id span{font:11px/1 var(--f-mono);color:var(--dim)}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px;background:var(--well)}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:999px;font-weight:600;font-size:12.5px;color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--volt);color:#fff;box-shadow:0 0 16px rgba(77,124,255,.45)}
+.seg button[data-mode="standby"][aria-pressed="true"]{background:#2a3146;box-shadow:none;color:var(--silver)}
+.top .spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;font:500 10.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;padding:6px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--dim)}
+.chip.warn{color:var(--warn);border-color:rgba(255,181,71,.35);background:var(--warn-soft)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--silver);padding:9px 14px;border-radius:10px;font-weight:600;font-size:13px;transition:border-color .15s,background .15s}
+.btn:hover{border-color:var(--volt)}
+.btn.primary{background:var(--volt);border-color:var(--volt);color:#fff}
+.btn.primary:hover{background:#5d88ff}
+.btn.ghost{background:transparent}
+.btn.danger{border-color:rgba(255,92,108,.45);color:#ffd0d5;background:var(--crit-soft)}
+.btn.danger:hover{border-color:var(--crit)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.views{padding:24px max(24px,env(safe-area-inset-right,0px)) 40px 24px;flex:1}
+.view{display:grid;gap:18px;animation:in .35s ease}
+@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+.view-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.view-head h1{font:22px/1.2 var(--f-display);letter-spacing:.03em}
+.view-head p{margin:6px 0 0;color:var(--dim);max-width:62ch}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.panel-h h2{font-size:14px;letter-spacing:.01em}
+.grid{display:grid;gap:18px}
+.g-hangar{grid-template-columns:minmax(0,1.35fr) minmax(300px,1fr)}
+.g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g-cmd{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+
+/* Hangar stage */
+.stage{position:relative;border-radius:18px;border:1px solid var(--line);overflow:hidden;min-height:520px;background:
+  radial-gradient(60% 50% at 50% 42%,rgba(77,124,255,.16),transparent 70%),
+  radial-gradient(80% 40% at 50% 100%,rgba(77,124,255,.10),transparent 70%),
+  linear-gradient(180deg,#0a0f1f,#05070e)}
+.stage::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(70% 60% at 50% 60%,#000 0,transparent 75%);-webkit-mask-image:radial-gradient(70% 60% at 50% 60%,#000 0,transparent 75%);opacity:.5;pointer-events:none}
+.robot-slot{position:absolute;inset:40px 0 70px}
+.hud{position:absolute;font:500 11px/1.5 var(--f-mono);color:var(--dim);letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
+.hud b{color:var(--silver);font-weight:500}
+.hud.tl{top:16px;left:18px}.hud.tr{top:16px;right:18px;text-align:right}
+.corner{position:absolute;width:18px;height:18px;border-color:var(--line-2);border-style:solid;pointer-events:none}
+.corner.a{top:10px;left:10px;border-width:1px 0 0 1px}.corner.b{top:10px;right:10px;border-width:1px 1px 0 0}
+.corner.c{bottom:10px;left:10px;border-width:0 0 1px 1px}.corner.d{bottom:10px;right:10px;border-width:0 1px 1px 0}
+.stage-bar{position:absolute;left:14px;right:14px;bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.visor-read{font:500 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(5,7,14,.7)}
+.visor-read b{color:var(--volt-hi);font-weight:500}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font:500 10.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;padding:5px 8px;border-radius:6px}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.ok{color:var(--ok);background:var(--ok-soft)}
+.pill.warn{color:var(--warn);background:var(--warn-soft)}
+.pill.crit{color:var(--crit);background:var(--crit-soft)}
+.pill.info{color:var(--volt-hi);background:var(--volt-soft)}
+.pill.off{color:var(--dim);background:rgba(103,114,138,.14)}
+.pill.sig{color:var(--signal);background:var(--signal-soft)}
+
+.modes{display:grid;gap:8px}
+.mode-opt{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:start;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--well)}
+.mode-opt .ind{grid-row:span 2;width:14px;height:14px;border-radius:50%;border:2px solid var(--line-2);margin-top:3px}
+.mode-opt b{color:var(--silver);font-size:13.5px}
+.mode-opt span{color:var(--dim);font-size:12.5px}
+.mode-opt[aria-pressed="true"]{border-color:rgba(77,124,255,.55);background:var(--volt-soft)}
+.mode-opt[aria-pressed="true"] .ind{border-color:var(--volt);background:radial-gradient(circle,var(--volt) 0 40%,transparent 45%)}
+.mode-opt[data-mode="standby"][aria-pressed="true"]{border-color:var(--line-2);background:#141a2a}
+.mode-opt[data-mode="standby"][aria-pressed="true"] .ind{border-color:var(--silver);background:radial-gradient(circle,var(--silver) 0 40%,transparent 45%)}
+
+.kill{display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap}
+.kill p{margin:0;color:var(--dim);font-size:12.5px;max-width:36ch}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+.modules{display:grid;gap:0}
+.mod{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.mod:first-child{border-top:0}
+.mod .ic{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--well);border:1px solid var(--line)}
+.mod .ic svg{width:15px;height:15px;stroke:var(--volt-hi);fill:none;stroke-width:1.7}
+.mod b{display:block;color:var(--silver);font-size:13px}
+.mod small{display:block;color:var(--dim);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.kpi{display:grid;gap:6px}
+.kpi .v{font:600 24px/1.1 var(--f-body);color:var(--silver);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi .d{font:12px/1 var(--f-mono)}
+.up{color:var(--ok)}.down{color:var(--crit)}
+.meter{height:6px;border-radius:999px;background:var(--well);border:1px solid var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--volt),var(--volt-hi));border-radius:inherit;transition:width .4s}
+.meter.hot i{background:linear-gradient(90deg,var(--warn),#ffd08a)}
+
+.chart{position:relative;height:210px}
+.chart svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.chart .yl{position:absolute;left:0;font:10.5px/1 var(--f-mono);color:var(--dim);transform:translateY(-50%)}
+.chart .end{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--volt);box-shadow:0 0 0 4px rgba(77,124,255,.25);transform:translate(-50%,-50%)}
+.chart .xl{position:absolute;bottom:-18px;font:10.5px/1 var(--f-mono);color:var(--dim)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--dim);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+.alloc{display:flex;height:10px;border-radius:999px;overflow:hidden;gap:2px}
+.alloc span{display:block;height:100%}
+.alloc-key{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12px}
+.alloc-key i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px}
+
+/* Crew pipeline */
+.crew{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:4px 0 14px}
+.crew-step{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--well);position:relative;min-width:0}
+.crew-step .role{font:500 10.5px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.crew-step .st{margin-top:8px;font-weight:600;color:var(--silver);font-size:13px}
+.crew-step.active{border-color:rgba(77,124,255,.55);box-shadow:0 0 0 3px rgba(77,124,255,.12)}
+.crew-step.done{border-color:rgba(55,211,154,.35)}
+.crew-step.veto{border-color:rgba(255,92,108,.55);background:var(--crit-soft)}
+.proposal{display:grid;gap:12px}
+.prop-main{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.prop-main .what{font:600 20px/1.2 var(--f-body);color:var(--silver)}
+.prop-main .what em{font-style:normal;color:var(--volt-hi)}
+.reason{color:var(--text);margin:0;max-width:70ch}
+.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 16px;font-size:12.5px}
+.checks div{display:flex;gap:8px;align-items:baseline}
+.checks .ok{color:var(--ok)}.checks .bad{color:var(--crit)}
+.checks span{color:var(--dim)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.feed{display:grid}
+.feed-row{display:grid;grid-template-columns:52px 96px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:13px;align-items:baseline}
+.feed-row:first-child{border-top:0}
+.feed-row time{font:11.5px/1 var(--f-mono);color:var(--dim)}
+.role-tag{font:500 10px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+.role-analyst{color:var(--volt-hi)}.role-risk{color:var(--warn)}.role-executor{color:var(--ok)}.role-operator{color:var(--signal)}.role-system{color:var(--dim)}
+.feed-row p{margin:0;color:var(--text);min-width:0}
+.feed-row p b{color:var(--silver);font-weight:600}
+
+.report p{margin:0 0 10px;color:var(--text);max-width:70ch}
+.report p:last-child{margin:0}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font:500 10.5px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-align:left;padding:0 10px 10px 0;font-weight:500}
+td{padding:11px 10px 11px 0;border-top:1px solid var(--line);color:var(--text);vertical-align:top}
+td.r,th.r{text-align:right;padding-right:0;padding-left:12px}
+td b{color:var(--silver);font-weight:600}
+.tbl-wrap{overflow-x:auto}
+
+/* Protocols */
+.proto{display:grid;gap:14px;align-content:start}
+.proto-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.proto-h h2{font:15px/1.2 var(--f-display);letter-spacing:.04em}
+.proto-h p{margin:6px 0 0;color:var(--dim);font-size:13px}
+.switch{position:relative;width:44px;height:24px;flex:none;border-radius:999px;border:1px solid var(--line-2);background:var(--well);padding:0}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--dim);transition:transform .2s,background .2s}
+.switch[aria-checked="true"]{background:var(--volt-soft);border-color:var(--volt)}
+.switch[aria-checked="true"]::after{transform:translateX(20px);background:var(--volt-hi)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.field{display:grid;gap:6px}
+.field label{font:500 10.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.field input,.field select{width:100%;background:var(--well);border:1px solid var(--line-2);border-radius:9px;padding:9px 10px;color:var(--silver);font-variant-numeric:tabular-nums}
+.field input:focus,.field select:focus{outline:none;border-color:var(--volt)}
+.proto-foot{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;color:var(--dim);border-top:1px solid var(--line);padding-top:12px;flex-wrap:wrap}
+.proto.off .fields{opacity:.45}
+
+/* Shield */
+.limit{display:grid;gap:10px;padding:14px 0;border-top:1px solid var(--line)}
+.limit:first-of-type{border-top:0;padding-top:0}
+.limit-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.limit-h b{color:var(--silver)}
+.limit-h .val{font:600 18px/1 var(--f-body);color:var(--silver);font-variant-numeric:tabular-nums}
+.limit-h .val.changed{color:var(--volt-hi)}
+.limit small{color:var(--dim);font-size:12px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:var(--well);border:1px solid var(--line);outline:none;padding:0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--silver);border:3px solid var(--volt);box-shadow:0 0 12px rgba(77,124,255,.6)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--silver);border:3px solid var(--volt)}
+.wl{display:flex;flex-wrap:wrap;gap:8px}
+.wl button{border:1px solid var(--line-2);background:var(--well);border-radius:9px;padding:7px 11px;font:500 12px/1 var(--f-mono);color:var(--dim)}
+.wl button[aria-pressed="true"]{color:var(--silver);border-color:rgba(77,124,255,.55);background:var(--volt-soft)}
+.diff{font:12px/1.6 var(--f-mono);background:var(--well);border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--text);min-height:48px;overflow-x:auto}
+.diff .add{color:var(--ok)}.diff .rm{color:var(--crit)}
+.tx-state{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--dim);flex-wrap:wrap}
+
+/* Simulation */
+.progress{height:4px;border-radius:999px;background:var(--well);overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--volt);transition:width .1s linear}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.metric{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--well)}
+.metric .eyebrow{display:block;margin-bottom:8px}
+.metric b{font:600 18px/1 var(--f-body);color:var(--silver);font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--dim);margin:0}
+
+/* Black box */
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters .seg button{padding:6px 12px}
+.search{background:var(--well);border:1px solid var(--line-2);border-radius:999px;padding:8px 14px;min-width:0;width:220px;max-width:100%;color:var(--silver)}
+.bb-row{cursor:pointer}
+.bb-row:hover td{background:rgba(130,160,255,.04)}
+.bb-detail td{padding:0 0 14px;border-top:0}
+.bb-detail .box{background:var(--well);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:6px;font-size:12.5px}
+.bb-detail .box div{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px}
+.bb-detail .box span{color:var(--dim)}
+.bb-detail .box code{font:12px var(--f-mono);color:var(--text);word-break:break-all}
+
+/* Passport */
+.plate{position:relative;border-radius:18px;padding:24px;border:1px solid var(--line-2);background:
+  linear-gradient(135deg,rgba(226,232,243,.08),rgba(226,232,243,0) 40%),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 2px,transparent 2px 5px),
+  linear-gradient(160deg,#141b30,#0a0f1d);overflow:hidden}
+.plate::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(77,124,255,.28),transparent 65%)}
+.plate-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;position:relative;z-index:1}
+.serial{font:clamp(26px,4vw,38px)/1 var(--f-display);color:var(--silver);letter-spacing:.05em;margin-top:10px}
+.plate dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px 20px;margin:24px 0 0;position:relative;z-index:1}
+.plate dt{font:500 10px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.plate dd{margin:6px 0 0;color:var(--silver);font:500 13px/1.3 var(--f-mono);word-break:break-all}
+.caps{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px;position:relative;z-index:1}
+.caps span{font:500 11px/1 var(--f-mono);padding:6px 9px;border-radius:6px;border:1px solid var(--line-2);color:var(--text)}
+.ring{width:132px;height:132px;flex:none;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font:600 30px/1 var(--f-body);color:var(--silver)}
+.ring small{position:absolute;left:0;right:0;bottom:30px;text-align:center;font:10px var(--f-mono);color:var(--dim);letter-spacing:.1em}
+.rep{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.rep-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px;flex:1;min-width:200px}
+.rep-stats b{display:block;color:var(--silver);font:600 17px/1.2 var(--f-body);font-variant-numeric:tabular-nums}
+.rep-stats span{font-size:12px;color:var(--dim)}
+.classes td:first-child b{font-family:var(--f-display);font-size:12px;letter-spacing:.05em}
+tr.current td{background:var(--volt-soft)}
+tr.current td:first-child{box-shadow:inset 3px 0 0 var(--volt)}
+
+.banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 16px;border-radius:12px;border:1px solid var(--line-2);background:#121829;color:var(--silver);font-size:13px}
+.banner[hidden]{display:none}
+
+.wallet-pop{position:absolute;right:0;top:calc(100% + 8px);width:min(300px,86vw);background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;padding:14px;box-shadow:0 20px 50px rgba(0,0,0,.5);z-index:30;font-size:13px}
+.wallet-pop p{margin:0 0 10px;color:var(--text)}
+.rel{position:relative}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;transition:.25s;background:var(--panel-2);border:1px solid var(--line-2);color:var(--silver);padding:11px 16px;border-radius:12px;font-size:13px;z-index:60;pointer-events:none;max-width:calc(100vw - 32px);box-shadow:0 16px 40px rgba(0,0,0,.45)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.tabbar{display:none}
+
+@media (max-width:1180px){
+  .g-hangar,.g-cmd{grid-template-columns:minmax(0,1fr)}
+  .g-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  .top{padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));gap:10px}
+  .views{padding:18px max(16px,env(safe-area-inset-right,0px)) calc(96px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  .g-2,.g-3{grid-template-columns:minmax(0,1fr)}
+  .stage{min-height:420px}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(8,11,22,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));gap:0}
+  .tabbar a{flex:1 1 0;min-width:0;display:grid;justify-items:center;gap:3px;padding:6px 2px;border-radius:10px;color:var(--dim);text-decoration:none;font-size:9.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tabbar a svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6}
+  .tabbar a[aria-current="page"]{color:var(--silver);background:var(--volt-soft)}
+  .top .chip.demo{display:none}
+}
+@media (max-width:520px){
+  .g-4{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .crew{grid-template-columns:minmax(0,1fr)}
+  .checks{grid-template-columns:minmax(0,1fr)}
+  .feed-row{grid-template-columns:44px minmax(0,1fr)}
+  .feed-row .role-tag{grid-column:2}
+  .feed-row p{grid-column:2}
+  .seg button{padding:7px 10px}
+  .kpi .v{font-size:20px}
+  .hide-sm{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== Landing-consistent layer ===== */
+:root{--chrome:linear-gradient(180deg,#ffffff 0%,#dfe6f3 38%,#9aa7c2 72%,#e9eef8 100%);--ch:10px;--fc:rgba(137,168,255,.55)}
+body::after{content:"";position:fixed;inset:0;z-index:70;pointer-events:none;background:repeating-linear-gradient(180deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px),radial-gradient(120% 90% at 50% 40%,transparent 62%,rgba(0,0,0,.45) 100%)}
+.view-head h1,.serial{color:transparent;background:var(--chrome);-webkit-background-clip:text;background-clip:text}
+.view-head .eyebrow{color:var(--volt-hi);display:inline-flex;align-items:center;gap:12px}
+.view-head .eyebrow::after{content:"";width:90px;height:1px;background:linear-gradient(90deg,var(--volt),transparent)}
+.btn{border-radius:0;clip-path:polygon(var(--ch) 0,100% 0,100% calc(100% - var(--ch)),calc(100% - var(--ch)) 100%,0 100%,0 var(--ch));text-transform:uppercase;letter-spacing:.11em;font-size:11.5px;font-weight:700;padding:11px 16px;border-color:transparent;box-shadow:inset 0 0 0 1px var(--line-2)}
+.btn.primary{background:linear-gradient(180deg,#6a93ff,#3d66f0);box-shadow:none}
+.btn.primary:hover{background:linear-gradient(180deg,#7da2ff,#4d74ff)}
+.btn.danger{box-shadow:inset 0 0 0 1px rgba(255,92,108,.5)}
+.btn:hover{border-color:transparent;box-shadow:inset 0 0 0 1px var(--volt)}
+.seg{border-radius:0;clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px)}
+.seg button{border-radius:0;text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+.panel,.stage,.plate,.mode-opt,.crew-step,.metric,.class-chip,.wl button,.field input,.field select,.search,.diff,.bb-detail .box{border-radius:4px}
+.panel{background:
+  linear-gradient(var(--fc),var(--fc)) top left/14px 1px no-repeat,linear-gradient(var(--fc),var(--fc)) top left/1px 14px no-repeat,
+  linear-gradient(var(--fc),var(--fc)) top right/14px 1px no-repeat,linear-gradient(var(--fc),var(--fc)) top right/1px 14px no-repeat,
+  linear-gradient(var(--fc),var(--fc)) bottom left/14px 1px no-repeat,linear-gradient(var(--fc),var(--fc)) bottom left/1px 14px no-repeat,
+  linear-gradient(var(--fc),var(--fc)) bottom right/14px 1px no-repeat,linear-gradient(var(--fc),var(--fc)) bottom right/1px 14px no-repeat,
+  linear-gradient(180deg,rgba(16,23,43,.85),rgba(9,13,26,.9))}
+.panel-h h2{font:12px/1.2 var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--silver)}
+.nav a{border-radius:0;border-width:0 0 0 2px;border-left-color:transparent}
+.nav a[aria-current="page"]{border-left-color:var(--volt);background:linear-gradient(90deg,var(--volt-soft),transparent)}
+.chip.live{color:var(--ok);border-color:rgba(55,211,154,.4);background:var(--ok-soft)}
+.wdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;background:var(--dim)}
+.wdot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}.wdot.bad{background:var(--warn)}
+.sdot{display:block;width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.sdot.ok{background:var(--ok)}.sdot.warn{background:var(--warn)}.sdot.info{background:var(--volt-hi)}
+.wallet-pop{border-radius:4px;padding:16px;width:min(330px,calc(100vw - 32px))}
+.wp-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.wp-h b{color:var(--silver)}
+.wp-list{display:grid;gap:6px;margin-bottom:10px}
+.wp-wallet{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:1px solid var(--line-2);background:var(--well);color:var(--silver);font-weight:600;text-align:left}
+.wp-wallet:hover{border-color:var(--volt)}
+.wp-wallet img,.wp-wallet i{width:22px;height:22px;border-radius:5px;background:var(--panel-2);flex:none}
+.wp-note{font-size:12px;color:var(--dim);margin:6px 0 0!important}
+.wp-rows{display:grid;gap:7px;margin-bottom:14px;font-size:13px}
+.wp-rows div{display:flex;justify-content:space-between;gap:10px}
+.wp-rows span{color:var(--dim)}.wp-rows b{color:var(--silver);font-weight:600}.wp-rows a{color:var(--volt-hi)}
+.wp-actions{display:flex;flex-wrap:wrap;gap:8px}
+.wp-mini{padding:6px 10px;font-size:10px}
+#walletBtn{display:inline-flex;align-items:center}
+@media (max-width:520px){.wallet-pop{position:fixed;left:16px;right:16px;top:calc(76px + env(safe-area-inset-top,0px));width:auto}}
+
+.filters{min-width:0;max-width:100%}
+#bbFilter{max-width:100%;overflow-x:auto;flex-wrap:nowrap}
+#bbFilter button{flex:none}
+@media (max-width:520px){#bbFilter button{padding:6px 9px;font-size:10px}.search{width:100%}}
+/* Hide every scrollbar; scrolling still works (wheel, touch, keyboard) */
+html,body,*{scrollbar-width:none;-ms-overflow-style:none}
+*::-webkit-scrollbar{width:0;height:0;display:none}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-hangar" viewBox="0 0 24 24"><circle cx="12" cy="11" r="6.5"/><rect x="8.5" y="8.5" width="7" height="5" rx="2.2"/><path d="M9.5 19.5h5M12 17.5v2"/></symbol>
+  <symbol id="i-command" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 15l3-3 3 2 4-5"/></symbol>
+  <symbol id="i-protocols" viewBox="0 0 24 24"><path d="M5 7h10M5 12h14M5 17h8"/><circle cx="18" cy="7" r="2"/><circle cx="16" cy="17" r="2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4.4-3 7.8-7 9.5-4-1.7-7-5.1-7-9.5V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-sim" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9.5A1.7 1.7 0 0 0 6.5 21h11a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7.5 15h9"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M8 9h8M8 12.5h8M8 16h5"/></symbol>
+  <symbol id="i-passport" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="10" r="3"/><path d="M8.5 17h7"/></symbol>
+  <symbol id="i-sensor" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 16 0M7.5 12a4.5 4.5 0 0 1 9 0"/><circle cx="12" cy="13" r="1.5"/></symbol>
+  <symbol id="i-core" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></symbol>
+  <symbol id="i-act" viewBox="0 0 24 24"><path d="M5 12h10M11 7l5 5-5 5"/><path d="M19 5v14"/></symbol>
+</svg>
+
+<div class="app">
+  <aside class="rail" aria-label="Unit navigation">
+    <div class="brand"><svg class="brand-mark" viewBox="40 145 1178 1022" aria-hidden="true"><g fill="currentColor"><polygon points="70,175 428,175 708,455 708,560 595,447 275,447 70,252"/><polygon points="1100,175 1188,175 1188,495 905,770 520,770 400,885 400,1137 70,1137 70,860 375,563 710,563"/><polygon points="525,780 645,885 975,885 1188,1080 1188,1137 790,1137 525,872"/></g></svg><div><div class="brand-name">KX-9</div><div class="brand-sub">COMMAND</div></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="rail-foot">
+      <div class="class-chip"><span class="eyebrow">Unit class</span><b id="railClass">—</b><small>Connect your wallet</small></div>
+      <p class="disclaim">Not financial advice. Trading involves risk.</p>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div class="unit-id"><i class="dot" id="statusDot"></i><div><b>KX-9</b><br><span id="statusText">Connect wallet</span></div></div>
+      <div class="seg" role="group" aria-label="Operating mode" id="topModes">
+        <button data-mode="supervised">Supervised</button>
+        <button data-mode="autonomous">Autonomous</button>
+        <button data-mode="standby">Standby</button>
+      </div>
+      <span class="spacer"></span>
+      
+      <span class="chip warn" id="rpcStatus" role="status" aria-live="polite" style="max-width:100%;white-space:normal">Checking mainnet RPC…</span>
+      <div class="rel">
+        <button class="btn" id="walletBtn" aria-expanded="false" aria-controls="walletPop">Connect wallet</button>
+        <div class="wallet-pop" id="walletPop" hidden></div>
+      </div>
+    </header>
+
+    <main class="views">
+      <div class="banner" id="standbyBanner" hidden><span><b>Standby engaged.</b> All unit activity is halted. No proposals, no trades.</span><button class="btn primary" data-set-mode="supervised">Resume in Supervised</button></div>
+
+      <!-- HANGAR -->
+      <section class="view" id="v-hangar" data-view="hangar">
+        <div class="view-head"><div><span class="eyebrow">Hangar</span><h1>Unit KX-9</h1><p>Your unit's body and status. Drag the unit to rotate it. Its visor shows what it's doing.</p></div>
+          <button class="btn" id="diagBtn">Run diagnostic</button></div>
+        <div class="grid g-hangar">
+          <div class="stage">
+            <i class="corner a"></i><i class="corner b"></i><i class="corner c"></i><i class="corner d"></i>
+            <div class="hud tl">Serial <b id="hudSerial">—</b><br>Class <b id="hudClass">—</b><br>Registry <b id="hudRegistry">—</b></div>
+            <div class="hud tr">Mode <b id="hudMode">Supervised</b><br>Power <b id="hudPower">—</b><br>Uptime <b>—</b></div>
+            <div class="robot-slot" data-robot="big"></div>
+            <div class="stage-bar"><span class="visor-read">Visor · <b id="visorState">Idle</b></span><span class="visor-read">Last action · <b id="lastAction">—</b></span></div>
+          </div>
+          <div class="grid" style="align-content:start">
+            <div class="panel">
+              <div class="panel-h"><h2>Operating mode</h2><span class="pill info" id="modePill">Not connected</span></div>
+              <div class="modes" id="modeOpts">
+                <button class="mode-opt" data-mode="supervised"><i class="ind"></i><b>Supervised</b><span>The unit proposes. You approve every trade.</span></button>
+                <button class="mode-opt" data-mode="autonomous"><i class="ind"></i><b>Autonomous</b><span>The unit trades by itself, only inside Shield limits.</span></button>
+                <button class="mode-opt" data-mode="standby"><i class="ind"></i><b>Standby</b><span>Powered down. Nothing runs until you resume.</span></button>
+              </div>
+            </div>
+            <div class="panel kill">
+              <div><h2 style="font-size:14px">Kill switch</h2><p>Stops all activity immediately and cancels the pending proposal.</p></div>
+              <div class="confirm" id="killWrap"><button class="btn danger" id="killBtn">Engage Standby</button></div>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h2>Modules</h2><span class="eyebrow">Status</span></div>
+              <div class="modules" id="modules"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMMAND -->
+      <section class="view" id="v-command" data-view="command" hidden>
+        <div class="view-head"><div><span class="eyebrow">Command Center</span><h1>Telemetry &amp; decisions</h1><p>Every decision passes through the command crew. The Risk Officer can veto anything the Analyst proposes.</p></div></div>
+        <div class="grid g-4" id="kpis"></div>
+        <div class="grid g-cmd">
+          <div class="grid" style="align-content:start">
+            <div class="panel" id="propPanel">
+              <div class="panel-h"><h2>Current decision</h2><span class="pill info" id="propPill">Analyzing</span></div>
+              <div class="crew" id="crew"></div>
+              <div class="proposal" id="proposal"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h2>Portfolio value · 30 days</h2><div class="legend"><span><i style="background:var(--volt)"></i>Unit portfolio</span></div></div>
+              <div class="chart" id="eqChart"></div>
+              <div style="height:26px"></div>
+              <div class="alloc" id="alloc"></div>
+              <div class="alloc-key" id="allocKey"></div>
+            </div>
+          </div>
+          <div class="grid" style="align-content:start">
+            <div class="panel">
+              <div class="panel-h"><h2>Decision feed</h2><a href="#blackbox" class="eyebrow" style="text-decoration:none;color:var(--volt-hi)">Black Box →</a></div>
+              <div class="feed" id="feed"></div>
+            </div>
+            <div class="panel report">
+              <div class="panel-h"><h2>Mission report</h2><span class="eyebrow" id="reportDate"></span></div>
+              <div id="report"></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Holdings</h2><span class="eyebrow">Verified balances</span></div>
+          <div class="tbl-wrap"><table id="holdings"></table></div>
+        </div>
+      </section>
+
+      <!-- PROTOCOLS -->
+      <section class="view" id="v-protocols" data-view="protocols" hidden>
+        <div class="view-head"><div><span class="eyebrow">Protocols</span><h1>Trading protocols</h1><p>Rule-based programs your unit runs. The Analyst uses them to form proposals. Shield limits apply on top of every protocol.</p></div>
+          <button class="btn primary" id="saveProto">Save protocols</button></div>
+        <div class="grid g-2" id="protoGrid"></div>
+        <p class="note">Stock tokens track the price of the underlying share and may not be available in every country. KX-9 is not affiliated with NVIDIA Corporation.</p>
+      </section>
+
+      <!-- SHIELD -->
+      <section class="view" id="v-shield" data-view="shield" hidden>
+        <div class="view-head"><div><span class="eyebrow">Shield</span><h1>Safety limits</h1><p>These limits live in the Shield contract on Robinhood Chain. The Core can't override them, and changing them needs your signature.</p></div></div>
+        <div class="grid g-cmd">
+          <div class="panel" id="limits"></div>
+          <div class="grid" style="align-content:start">
+            <div class="panel">
+              <div class="panel-h"><h2>Today's usage</h2><span class="eyebrow">Resets 00:00 UTC</span></div>
+              <div id="usage"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h2>Pending changes</h2></div>
+              <div class="diff" id="diff"></div>
+              <div style="height:12px"></div>
+              <div class="actions"><button class="btn primary" id="signShield" disabled>Sign &amp; update Shield</button><button class="btn ghost" id="resetShield" disabled>Discard</button></div>
+              <div style="height:10px"></div>
+              <div class="tx-state" id="shieldTx"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h2>Recent vetoes</h2></div>
+              <div class="feed" id="vetoes"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="v-history" data-view="history" hidden>
+        <div class="view-head"><div><span class="eyebrow">Historical testing</span><h1>Test your protocol</h1><p>Replay your saved settings against daily prices you supply. No order is sent and no price history is invented.</p></div></div>
+        <div class="grid g-cmd">
+          <div class="panel">
+            <div class="panel-h"><h2>Results</h2><span class="eyebrow">Historical replay only</span></div>
+            <div id="historyResults"><p class="note">Choose a CSV file with two columns: <code>date,close</code>. Use increasing UTC dates and positive daily closing prices.</p></div>
+          </div>
+          <div class="panel">
+            <form id="historyForm" class="grid" style="gap:14px">
+              <div class="field"><label for="historyProtocol">Protocol</label><select id="historyProtocol"><option value="accumulate">Accumulate</option><option value="balance">Balance</option><option value="guard">Guard</option><option value="trend">Trend</option><option value="physical">Physical AI · NVDA</option></select></div>
+              <div class="field"><label for="historyAsset">Asset</label><select id="historyAsset"><option>NVDA</option><option>ETH</option><option>TSLA</option><option>AAPL</option><option>AMZN</option><option>PLTR</option></select></div>
+              <div class="field"><label for="historyCapital">Starting capital (USDC)</label><input id="historyCapital" type="number" min="100" max="10000000" step="100" value="5000" required></div>
+              <div class="field"><label for="historyFile">Daily price CSV</label><input id="historyFile" type="file" accept=".csv,text/csv" required aria-describedby="historyFormat"></div>
+              <p class="note" id="historyFormat">Format: date,close. Between 2 and 366 rows. Prices are supplied by you and are not independently certified by KX-9. The file is parsed in your browser; no file is stored.</p>
+              <button class="btn primary" type="submit" id="historyRun">Run historical test</button>
+              <p class="note" id="historyStatus" role="status" aria-live="polite">Sign in with your wallet to run a test.</p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- BLACK BOX -->
+      <section class="view" id="v-blackbox" data-view="blackbox" hidden>
+        <div class="view-head"><div><span class="eyebrow">Black Box</span><h1>Flight recorder</h1><p>Every proposal, veto, approval and trade, with the reason behind it. Select a row to see its validation record.</p></div></div>
+        <div class="panel">
+          <div class="panel-h">
+            <div class="filters"><div class="seg" role="group" aria-label="Filter by role" id="bbFilter">
+              <button data-f="all" aria-pressed="true">All</button><button data-f="analyst">Analyst</button><button data-f="risk">Risk</button><button data-f="executor">Executor</button><button data-f="operator">Operator</button></div></div>
+            <input class="search" id="bbSearch" type="search" placeholder="Search asset or event" aria-label="Search Black Box">
+          </div>
+          <div class="tbl-wrap"><table id="bbTable"></table></div>
+        </div>
+      </section>
+
+      <!-- PASSPORT -->
+      <section class="view" id="v-passport" data-view="passport" hidden>
+        <div class="view-head"><div><span class="eyebrow">Unit Passport</span><h1>Identity &amp; reputation</h1><p>Verified unit ownership, Shield status and recorded decisions. Record hashes are integrity checks, not on-chain identity attestations.</p></div></div>
+        <div class="grid g-cmd">
+
+          <div class="plate" id="identityPlate"></div>
+          <div class="panel">
+            <div class="panel-h"><h2>Reputation</h2><span class="eyebrow">On-chain records</span></div>
+            <p class="note">No verified reputation records available.</p>
+          </div>
+        </div>
+        <div class="grid g-2">
+          <div class="panel">
+            <div class="panel-h"><h2>On-chain status</h2><span class="eyebrow">Robinhood Chain · 4663</span></div>
+            <div class="modules" id="chainStatus"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-h"><h2>Commission your unit</h2><span class="eyebrow">KX9ShieldFactory</span></div>
+            <p class="note" style="font-size:13.5px;margin-bottom:14px">Commissioning deploys a Shield vault that you own, with the limits set on the Shield page. Funds stay in your vault and only you can withdraw them.</p>
+            <div class="actions"><button class="btn primary" id="commissionBtn">Commission unit</button><button class="btn ghost" id="connectFromPassport">Wallet</button></div>
+          </div>
+        </div>
+        <div class="grid g-2">
+          <div class="panel">
+            <div class="panel-h"><h2>Validation records</h2><span class="eyebrow">Record integrity</span></div>
+            <div class="feed" id="proofs"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-h"><h2>Unit class</h2><span class="eyebrow">Hold $KX9 to upgrade</span></div>
+            <div class="tbl-wrap"><table class="classes" id="classes"></table></div>
+            <p class="note" style="margin-top:12px">Holding requirements are announced at launch. $KX9 is an access key to the tool and carries no claim on profits.</p>
+          </div>
+        </div>
+      </section>
+    <footer aria-label="Project links"><div class="kx9-project-links" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;padding:20px 24px;font-size:12px;border-top:1px solid rgba(150,170,220,.16)"><a href="https://github.com/kx9-dev" target="_blank" rel="noopener noreferrer">GitHub · kx9-dev</a><a href="mailto:dev@kx9.tech">dev@kx9.tech</a></div></footer>
+</main>
+  </div>
+</div>
+
+<nav class="tabbar" id="tabbar" aria-label="Unit navigation"></nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>window.KX9_API = location.origin;</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="robot.js"></script>
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const VIEWS=[['hangar','Hangar','i-hangar'],['command','Command','i-command'],['protocols','Protocols','i-protocols'],['shield','Shield','i-shield'],['history','Historical test','i-sim'],['blackbox','Black Box','i-box'],['passport','Passport','i-passport']];
+const fmt=(n,d=2)=>n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const usd=(n,d=2)=>(n<0?'-$':'$')+fmt(Math.abs(n),d);
+const short=h=>h.slice(0,6)+'…'+h.slice(-4);
+const hhmm=d=>d.toISOString().slice(11,16)+' UTC';
+
+const ASSETS={NVDA:{name:'NVIDIA stock token',p:null,c:'#4d7cff'},TSLA:{name:'Tesla stock token',p:null,c:'#86a6ff'},AAPL:{name:'Apple stock token',p:null,c:'#b9c8ff'},AMZN:{name:'Amazon stock token',p:null,c:'#8a6bff'},PLTR:{name:'Palantir stock token',p:null,c:'#ff4fa0'},ETH:{name:'Ether',p:null,c:'#37d39a'},USDC:{name:'USD Coin',p:null,c:'#3a4560'}};
+const S={
+  mode:'standby',
+  holdings:{},
+  open:{},
+  shield:{maxTrade:500,dailyCap:2000,slippage:0.8,cooldown:10,whitelist:['NVDA','TSLA','AAPL','AMZN','PLTR','ETH','USDC']},
+  draft:null,used:0,
+  protocols:{
+    accumulate:{on:false,asset:'ETH',amount:100,every:'Daily'},
+    balance:{on:false,drift:5,target:'Growth 60/40'},
+    guard:{on:false,tp:12,sl:6},
+    trend:{on:false,asset:'NVDA',size:250,window:20},
+    physical:{on:false,amount:150,every:'Weekly',dip:5,dipAmount:300}
+  },
+  log:[],pending:null,stage:'idle',lastAction:'—'
+};
+Object.keys(ASSETS).forEach(k=>S.open[k]=ASSETS[k].p);
+S.draft=JSON.parse(JSON.stringify(S.shield));
+
+/* ---------- nav ---------- */
+const navHtml=VIEWS.map(([id,label,ic])=>`<a href="#${id}" data-v="${id}"><svg><use href="#${ic}"/></svg><span>${label}</span></a>`).join('');
+$('#nav').innerHTML=navHtml;$('#tabbar').innerHTML=navHtml;
+
+/* ---------- robot ---------- */
+const robot=window.KX9?KX9.create($('.robot-slot[data-robot="big"]'),{distance:7.6}):null;
+let moodTimer=null;
+function baseMood(){if(S.mode==='standby')return'standby';if(S.stage==='risk'||S.stage==='exec')return'think';if(S.mode==='autonomous')return'scan';return'idle'}
+const MOODNAME={idle:'Idle',scan:'Scanning',alert:'Alert',happy:'Confirmed',think:'Processing',standby:'Standby'};
+function setMood(m,hold){
+  if(!robot)return;
+  clearTimeout(moodTimer);
+  robot.setMood(m);$('#visorState').textContent=MOODNAME[m];
+  if(hold){moodTimer=setTimeout(()=>setMood(baseMood()),hold)}
+}
+
+/* ---------- routing ---------- */
+function route(){
+  let v=(location.hash||'#hangar').slice(1);
+  if(!VIEWS.some(x=>x[0]===v))v='hangar';
+  $$('.view').forEach(s=>s.hidden=s.dataset.view!==v);
+  $$('[data-v]').forEach(a=>a.dataset.v===v?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+  render(v);
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',route);
+
+/* ---------- mode ---------- */
+function setMode(m){
+  S.mode=m;
+  if(m==='standby'){S.pending=null;S.stage='idle';clearTimeout(flowT);}
+  else if(!S.pending&&S.stage==='idle'){scheduleProposal(2500)}
+  syncMode();addLog('operator','Mode change',`Mode set to <b>${cap(m)}</b>.`,'—','—');
+  setMood(baseMood());
+  render(current());
+}
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+function syncMode(){
+  $$('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
+  $('#modePill').textContent=cap(S.mode);$('#modePill').className='pill '+(S.mode==='standby'?'off':S.mode==='autonomous'?'sig':'info');
+  $('#hudMode').textContent=cap(S.mode);$('#hudPower').textContent=S.mode==='standby'?'18%':'100%';
+  $('#statusDot').classList.toggle('standby',S.mode==='standby');
+  $('#statusText').textContent=(S.mode==='standby'?'Standby':'Online')+' · Robinhood Chain';
+  $('#standbyBanner').hidden=S.mode!=='standby';
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-mode]');if(b&&!b.closest('#killWrap'))requestMode(b.dataset.mode);
+  const r=e.target.closest('[data-set-mode]');if(r)requestMode(r.dataset.setMode);
+});
+// kill switch with inline confirm
+$('#killWrap').addEventListener('click',e=>{
+  const w=$('#killWrap');
+  if(e.target.id==='killBtn'){w.innerHTML='<span style="font-size:12.5px;color:var(--silver)">Halt everything?</span><button class="btn danger" id="killYes">Yes, halt</button><button class="btn ghost" id="killNo">Cancel</button>';}
+  else if(e.target.id==='killYes'){requestMode('standby');w.innerHTML='<button class="btn danger" id="killBtn">Engage Standby</button>';}
+  else if(e.target.id==='killNo'){w.innerHTML='<button class="btn danger" id="killBtn">Engage Standby</button>';}
+});
+
+/* ---------- wallet ---------- */
+/* wallet: see the Wallet, chain & contracts module below */
+
+/* ---------- toast ---------- */
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600)}
+
+/* ---------- log ---------- */
+function addLog(role,event,text,asset,amt,extra){S.log.unshift(Object.assign({t:new Date(),role,event,text,asset,amt,tx:null,proof:null},extra||{}));S.lastAction=event+(asset&&asset!=='—'?' · '+asset:'');$('#lastAction').textContent=S.lastAction;}
+const ROLE={analyst:'Analyst',risk:'Risk Officer',executor:'Executor',operator:'Operator',system:'System'};
+
+let flowT=null;
+function scheduleProposal(){clearTimeout(flowT);}
+
+/* ---------- renderers ---------- */
+function current(){return (location.hash||'#hangar').slice(1)||'hangar'}
+function render(v){
+  if(v==='hangar')rHangar();
+  if(v==='command')rCommand();
+  if(v==='protocols')rProtocols();
+  if(v==='shield')rShield();
+
+  if(v==='history')renderHistory();
+  if(v==='blackbox')rBB();
+  if(v==='passport')rPassport();
+}
+/* Shield */
+const LIMITS=[
+  ['maxTrade','Max per trade','Largest single trade the Executor may send.',50,5000,50,v=>usd(v,0)],
+  ['dailyCap','Daily cap','Total value the unit may trade per day.',100,20000,100,v=>usd(v,0)],
+  ['slippage','Slippage limit','Trades with higher estimated slippage are blocked.',0.1,3,0.1,v=>fmt(v,1)+'%'],
+  ['cooldown','Cooldown','Minimum wait between two trades.',0,120,5,v=>v+' min']
+];
+function rShield(){
+  const d=S.draft,s=S.shield;
+  $('#limits').innerHTML='<div class="panel-h"><h2>Limits</h2><span class="pill ok">Armed</span></div>'+LIMITS.map(([k,l,h,mn,mx,st,f])=>`<div class="limit"><div class="limit-h"><b>${l}</b><span class="val ${d[k]!==s[k]?'changed':''}" id="lv-${k}">${f(d[k])}</span></div><input type="range" id="lim-${k}" data-lim="${k}" min="${mn}" max="${mx}" step="${st}" value="${d[k]}" aria-label="${l}"><small>${h}</small></div>`).join('')+
+  `<div class="limit"><div class="limit-h"><b>Asset whitelist</b><span class="mono" style="color:var(--dim);font-size:12px">${d.whitelist.length} allowed</span></div><div class="wl">${Object.keys(ASSETS).map(k=>`<button data-wl="${k}" aria-pressed="${d.whitelist.includes(k)}">${k}</button>`).join('')}</div><small>The unit can only trade assets on this list.</small></div>`;
+  rUsage();rDiff();
+  $('#vetoes').innerHTML=S.log.filter(l=>l.event==='Veto').slice(0,4).map(feedRow).join('')||'<p class="note">No vetoes yet.</p>';
+}
+function rUsage(){const p=S.used/S.shield.dailyCap*100;$('#usage').innerHTML=`<div class="kpi"><span class="v">${usd(S.used,0)} <span style="font-size:14px;color:var(--dim);font-weight:500">of ${usd(S.shield.dailyCap,0)}</span></span><div class="meter ${p>80?'hot':''}"><i style="width:${Math.min(100,p)}%"></i></div><span class="d" style="color:var(--dim)">${usd(Math.max(0,S.shield.dailyCap-S.used),0)} remaining · ${S.log.filter(l=>l.event==='Executed').length} trades today</span></div>`}
+function rDiff(){
+  const d=S.draft,s=S.shield;const lines=[];
+  LIMITS.forEach(([k,l,,,,,f])=>{if(d[k]!==s[k])lines.push(`<span class="rm">- ${l}: ${f(s[k])}</span><br><span class="add">+ ${l}: ${f(d[k])}</span>`)});
+  const add=d.whitelist.filter(x=>!s.whitelist.includes(x)),rm=s.whitelist.filter(x=>!d.whitelist.includes(x));
+  if(add.length)lines.push(`<span class="add">+ whitelist: ${add.join(', ')}</span>`);
+  if(rm.length)lines.push(`<span class="rm">- whitelist: ${rm.join(', ')}</span>`);
+  $('#diff').innerHTML=lines.length?lines.join('<br>'):'<span style="color:var(--dim)">No changes. Adjust a limit to stage an update.</span>';
+  $('#signShield').disabled=!lines.length;$('#resetShield').disabled=!lines.length;
+}
+$('#limits').addEventListener('input',e=>{const k=e.target.dataset.lim;if(!k)return;S.draft[k]=+e.target.value;const L=LIMITS.find(x=>x[0]===k);const el=$('#lv-'+k);el.textContent=L[6](S.draft[k]);el.classList.toggle('changed',S.draft[k]!==S.shield[k]);rDiff()});
+$('#limits').addEventListener('click',e=>{const b=e.target.closest('[data-wl]');if(!b)return;const k=b.dataset.wl,w=S.draft.whitelist;const i=w.indexOf(k);i>=0?w.splice(i,1):w.push(k);rShield()});
+$('#resetShield').addEventListener('click',()=>{S.draft=JSON.parse(JSON.stringify(S.shield));$('#shieldTx').innerHTML='';rShield()});
+$('#signShield').addEventListener('click',async()=>{
+  const tx=$('#shieldTx'),btn=$('#signShield');btn.disabled=true;const d=S.draft;
+  const r=await chainTx('Shield update',c=>c.setLimits([BigInt(Math.round(d.maxTrade*1e6)),BigInt(Math.round(d.dailyCap*1e6)),Math.round(d.slippage*100),Math.round(d.cooldown*60)]));
+  if(r==='abort'){btn.disabled=false;return}
+  const add=d.whitelist.filter(x=>!S.shield.whitelist.includes(x)),rm=S.shield.whitelist.filter(x=>!d.whitelist.includes(x));
+  for(const [k,on] of [...add.map(k=>[k,true]),...rm.map(k=>[k,false])]){const a=KX9_CONFIG.tokens[k];if(a&&ethers.isAddress(a))await chainTx(`Whitelist ${k}`,c=>c.setWhitelist(a,on));}
+  S.shield=JSON.parse(JSON.stringify(d));if(REMOTE)apiCall('/units/'+API.agentId+'/shield',{method:'PUT',body:{...S.shield,txHash:r.hash}}).then(syncNow).catch(e=>toast(e.message));addLog('operator','Shield updated','New limits written to the Shield contract.','—','—',{tx:r.hash});
+  tx.innerHTML=`<span class="pill ok">Confirmed</span><a class="mono" href="${explorerTx(r.hash)}" target="_blank" rel="noopener">tx ${short(r.hash)}</a>`;rShield();
+});
+
+/* Black box */
+let bbF='all',bbOpen=null;
+function rBB(){
+  const q=($('#bbSearch').value||'').toLowerCase();
+  const rows=S.log.filter(l=>(bbF==='all'||l.role===bbF)&&(!q||(l.asset+' '+l.event+' '+l.text).toLowerCase().includes(q)));
+  $('#bbTable').innerHTML=`<thead><tr><th>Time</th><th>Role</th><th>Event</th><th class="hide-sm">Asset</th><th class="r">Amount</th><th class="r hide-sm">Tx</th></tr></thead><tbody>`+
+  (rows.map((l,i)=>{const id='r'+S.log.indexOf(l);const pill=l.event==='Veto'?'crit':l.event==='Executed'?'ok':l.event==='Rejected'?'warn':l.event==='Proposal'?'info':'off';
+  return `<tr class="bb-row" data-id="${id}" tabindex="0"><td class="mono">${hhmm(l.t)}</td><td><span class="role-tag role-${l.role}">${ROLE[l.role]}</span></td><td><span class="pill ${pill}">${l.event}</span></td><td class="hide-sm"><b>${l.asset}</b></td><td class="r mono">${typeof l.amt==='number'?usd(l.amt,0):'—'}</td><td class="r mono hide-sm">${l.tx?short(l.tx):'—'}</td></tr>`+
+  (bbOpen===id?`<tr class="bb-detail"><td colspan="6"><div class="box"><div><span>Reason</span><p style="margin:0">${l.text}</p></div><div><span>Validation</span><code>${l.proof || 'Not recorded'}</code></div><div><span>Transaction</span><code>${l.tx||'No on-chain transaction for this event'}</code></div><div><span>Recorded</span><code>${l.t.toISOString()}</code></div></div></td></tr>`:'')}).join('')||'<tr><td colspan="6" style="color:var(--dim)">No entries match.</td></tr>')+'</tbody>';
+}
+$('#bbFilter').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(!b)return;bbF=b.dataset.f;$$('#bbFilter button').forEach(x=>x.setAttribute('aria-pressed',x===b));rBB()});
+$('#bbSearch').addEventListener('input',rBB);
+$('#bbTable').addEventListener('click',e=>{const r=e.target.closest('.bb-row');if(!r)return;bbOpen=bbOpen===r.dataset.id?null:r.dataset.id;rBB()});
+$('#bbTable').addEventListener('keydown',e=>{if(e.key==='Enter'){const r=e.target.closest('.bb-row');if(r){bbOpen=bbOpen===r.dataset.id?null:r.dataset.id;rBB()}}});
+
+/* ================= Wallet, chain & contracts ================= */
+const RPC_STATE = { connected: false, label: 'Checking mainnet RPC…', block: null };
+const KX9_CONFIG = {
+  chain: { chainId: 4663, hex: '0x1237', name: 'Robinhood Chain', rpc: 'https://rpc.mainnet.chain.robinhood.com', backendRpc: '/api/rpc',
+           explorer: 'https://robinhoodchain.blockscout.com', currency: { name: 'Ether', symbol: 'ETH', decimals: 18 } },
+  factory: '',          // KX9ShieldFactory address, set after `node scripts/deploy.mjs`
+  kx9Token: '',         // $KX9 token address, set at launch
+  api: location.origin + '/api',              // KX-9 backend base URL (proposals from the Core). Empty = no proposals
+  tokens: { USDC: '', ETH: '', NVDA: '', TSLA: '', AAPL: '', AMZN: '', PLTR: '' }, // asset addresses on Robinhood Chain
+  classThresholds: { mk1: 0, mk2: 0, mk3: 0 }   // whole $KX9 tokens, announced at launch
+};
+const ABI = {
+  factory: [
+    'function commission((uint256 maxTradeUsd,uint256 dailyCapUsd,uint16 slippageBps,uint32 cooldownSec) limits, address[] whitelist) returns (uint256 agentId, address shield)',
+    'function unitsOf(address) view returns (uint256[])',
+    'function shieldOf(uint256) view returns (address)',
+    'event UnitCommissioned(uint256 indexed agentId, address indexed operator, address shield, string serial)'],
+  shield: [
+    'function setMode(uint8 m)',
+    'function setLimits((uint256 maxTradeUsd,uint256 dailyCapUsd,uint16 slippageBps,uint32 cooldownSec) l)',
+    'function setWhitelist(address token, bool allowed)',
+    'function approveProposal(bytes32 proposalId, uint256 maxUsd, uint64 deadline)',
+    'function mode() view returns (uint8)',
+    'function limits() view returns ((uint256 maxTradeUsd,uint256 dailyCapUsd,uint16 slippageBps,uint32 cooldownSec))',
+    'function usedToday() view returns (uint256)',
+    'error Blocked(uint8 reason)', 'error NotOperator()', 'error NotExecutor()', 'error BadLimits()', 'error Expired()'],
+  erc20: ['function balanceOf(address) view returns (uint256)']
+};
+const BLOCK_REASON = { 1: 'asset not on the whitelist', 2: 'above max per trade', 3: 'daily cap reached', 4: 'slippage above limit',
+  5: 'cooldown still running', 6: 'unit is in Standby', 7: 'unit class too low (hold more $KX9)', 8: 'proposal not approved' };
+const MODES = ['supervised', 'autonomous', 'standby'];
+const W = { providers: [], eip: null, provider: null, signer: null, address: null, chainId: null, eth: null, kx9: null,
+  signedIn: false, shield: null, agentId: null, bound: false, busy: false };
+const onChain = () => W.address && W.chainId === KX9_CONFIG.chain.chainId;
+const live = () => !!(onChain() && W.shield && W.unitLoaded);
+const explorerTx = h => `${KX9_CONFIG.chain.explorer}/tx/${h}`;
+const explorerAddr = a => `${KX9_CONFIG.chain.explorer}/address/${a}`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+window.addEventListener('eip6963:announceProvider', e => {
+  const d = e.detail; if (!d || !d.provider || !d.info) return;
+  if (!W.providers.some(p => p.info.uuid === d.info.uuid)) { W.providers.push(d); if (!$('#walletPop').hidden) renderWallet(); }
+});
+try { window.dispatchEvent(new Event('eip6963:requestProvider')); } catch (e) {}
+function walletList() {
+  if (W.providers.length) return W.providers;
+  return window.ethereum ? [{ info: { uuid: 'injected', name: window.ethereum.isRabby ? 'Rabby' : window.ethereum.isCoinbaseWallet ? 'Coinbase Wallet' : window.ethereum.isMetaMask ? 'MetaMask' : 'Browser wallet', icon: '' }, provider: window.ethereum }] : [];
+}
+function classOf(bal) {
+  if (!KX9_CONFIG.kx9Token || bal == null) return null;
+  const t = KX9_CONFIG.classThresholds, n = Number(ethers.formatUnits(bal, 18));
+  return n >= t.mk3 && t.mk3 > 0 ? 'Mk III' : n >= t.mk2 && t.mk2 > 0 ? 'Mk II' : n >= t.mk1 && t.mk1 > 0 ? 'Mk I' : 'Observer';
+}
+function decodeErr(e) {
+  const data = e?.data || e?.info?.error?.data || e?.error?.data;
+  try { if (data) { const x = new ethers.Interface(ABI.shield).parseError(data); if (x) return x.name === 'Blocked' ? 'Shield blocked it: ' + (BLOCK_REASON[Number(x.args[0])] || 'rule ' + x.args[0]) : x.name; } } catch (_) {}
+  return e?.shortMessage || e?.reason || 'unknown error';
+}
+
+async function connectWallet(entry) {
+  if (!window.ethers) { toast('The wallet library did not load. Check your connection and reload.'); return; }
+  try {
+    W.eip = entry.provider; W.provider = new ethers.BrowserProvider(W.eip, 'any');
+    const accs = await W.eip.request({ method: 'eth_requestAccounts' });
+    if (!accs || !accs.length) throw new Error('No account');
+    W.address = ethers.getAddress(accs[0]); W.signer = await W.provider.getSigner(); W.walletName = entry.info.name;
+    bindWalletEvents(); await refreshChain(); await loadUnit();
+    renderWallet(); toast(`Connected ${short(W.address)}`);
+    if (W.chainId !== KX9_CONFIG.chain.chainId) toast('Switch to Robinhood Chain to use your unit.');
+  } catch (e) { toast(e.code === 4001 ? 'Connection was rejected in your wallet.' : 'Could not connect: ' + (e.shortMessage || e.message)); }
+}
+function bindWalletEvents() {
+  if (W.bound || !W.eip || !W.eip.on) return; W.bound = true;
+  W.eip.on('accountsChanged', a => { if (!a || !a.length) { disconnectWallet(); return; } S.log = []; S.pending = null; S.lastAction = '—'; $('#lastAction').textContent = '—'; stopRemote(); W.address = ethers.getAddress(a[0]); W.signedIn = false;
+    W.provider.getSigner().then(s => { W.signer = s; return refreshChain(); }).then(loadUnit).then(renderWallet); });
+  W.eip.on('chainChanged', () => { W.provider = new ethers.BrowserProvider(W.eip, 'any');
+    W.provider.getSigner().then(s => { W.signer = s; return refreshChain(); }).then(loadUnit).then(renderWallet); });
+}
+async function refreshChain() {
+  if (!W.eip) return;
+  try { W.chainId = Number(await W.eip.request({ method: 'eth_chainId' })); } catch (e) { W.chainId = null; }
+  W.eth = null; W.kx9 = null;
+  if (onChain()) {
+    try { W.eth = await W.provider.getBalance(W.address); } catch (e) {}
+    if (KX9_CONFIG.kx9Token) { try { W.kx9 = await new ethers.Contract(KX9_CONFIG.kx9Token, ABI.erc20, W.provider).balanceOf(W.address); } catch (e) {} }
+  }
+  syncWalletUi();
+}
+async function switchChain() {
+  const c = KX9_CONFIG.chain;
+  try { await W.eip.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: c.hex }] }); }
+  catch (e) {
+    if (e.code === 4902 || e?.data?.originalError?.code === 4902 || /unrecognized|not added|unknown chain/i.test(e.message || '')) {
+      try { await W.eip.request({ method: 'wallet_addEthereumChain', params: [{ chainId: c.hex, chainName: c.name, nativeCurrency: c.currency, rpcUrls: [c.rpc], blockExplorerUrls: [c.explorer] }] }); }
+      catch (e2) { toast('Robinhood Chain was not added to your wallet.'); return; }
+    } else { toast(e.code === 4001 ? 'Network switch was rejected.' : 'Could not switch network.'); return; }
+  }
+  await refreshChain(); await loadUnit(); renderWallet();
+}
+async function signIn() {
+  if (KX9_CONFIG.api) return apiLogin();
+  try {
+    const nonce = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    const host = location.host || 'kx9.app';
+    const msg = `${host} wants you to sign in with your Ethereum account:\n${W.address}\n\nSign in to KX-9 Command. This does not send a transaction or cost gas.\n\nURI: ${location.origin && location.origin !== 'null' ? location.origin : 'https://' + host}\nVersion: 1\nChain ID: ${KX9_CONFIG.chain.chainId}\nNonce: ${nonce}\nIssued At: ${new Date().toISOString()}`;
+    const sig = await W.signer.signMessage(msg);
+    if (ethers.verifyMessage(msg, sig) !== W.address) throw new Error('mismatch');
+    W.signedIn = true; W.session = { msg, sig };
+    addLog('operator', 'Signed in', `Operator ${short(W.address)} signed in.`, '—', '—');
+    renderWallet(); toast('Signed in.');
+  } catch (e) { toast(e.code === 4001 || e.code === 'ACTION_REJECTED' ? 'Signature was rejected.' : 'Sign-in failed.'); }
+}
+function disconnectWallet() {
+  S.log = []; S.pending = null; S.lastAction = '—'; $('#lastAction').textContent = '—';
+  Object.assign(W, { eip: null, provider: null, signer: null, address: null, chainId: null, eth: null, kx9: null, signedIn: false, shield: null, agentId: null, bound: false });
+  renderWallet(); syncWalletUi(); toast('Wallet disconnected.');
+}
+async function loadUnit() {
+  W.unitLoaded = false;
+  W.shield = null; W.agentId = null;
+  if (onChain() && KX9_CONFIG.factory) {
+    try {
+      const f = new ethers.Contract(KX9_CONFIG.factory, ABI.factory, W.provider);
+      const ids = await f.unitsOf(W.address);
+      if (ids.length) {
+        W.agentId = Number(ids[0]); W.shield = await f.shieldOf(ids[0]);
+        const sh = new ethers.Contract(W.shield, ABI.shield, W.provider);
+        const [m, l, used] = await Promise.all([sh.mode(), sh.limits(), sh.usedToday()]);
+        S.mode = MODES[Number(m)] || 'supervised';
+        S.shield.maxTrade = Number(l[0]) / 1e6; S.shield.dailyCap = Number(l[1]) / 1e6; S.shield.slippage = Number(l[2]) / 100; S.shield.cooldown = Math.round(Number(l[3]) / 60);
+        S.used = Number(used) / 1e6; S.draft = JSON.parse(JSON.stringify(S.shield));
+        W.unitLoaded = true;
+        syncMode(); render(current());
+      }
+    } catch (_) { W.shield = null; W.agentId = null; toast('Could not read your on-chain unit.'); }
+  }
+  syncWalletUi();
+}
+/* Sends a transaction only for a connected, verified on-chain unit. */
+async function chainTx(label, build) {
+  if (!W.address) { openWallet(); toast('Connect your wallet first.'); return 'abort'; }
+  if (!onChain()) { openWallet(); toast('Switch to Robinhood Chain first.'); return 'abort'; }
+  if (!W.shield) { toast('No on-chain unit is connected.'); return 'abort'; }
+  if (W.busy) { toast('Finish the transaction in your wallet first.'); return 'abort'; }
+  W.busy = true;
+  try {
+    const c = new ethers.Contract(W.shield, ABI.shield, W.signer);
+    toast(`${label}: confirm in your wallet`);
+    const tx = await build(c);
+    toast(`${label}: sent, waiting for confirmation`);
+    const r = await tx.wait();
+    toast(`${label}: confirmed`);
+    return { hash: r.hash };
+  } catch (e) {
+    toast(e.code === 'ACTION_REJECTED' || e.code === 4001 ? `${label} was rejected in your wallet.` : `${label} failed: ${decodeErr(e)}`);
+    return 'abort';
+  } finally { W.busy = false; }
+}
+async function commissionUnit() {
+  if (!W.address) { openWallet(); toast('Connect a wallet to commission a unit.'); return; }
+  if (!onChain()) { openWallet(); toast('Switch to Robinhood Chain first.'); return; }
+  if (!KX9_CONFIG.factory) { toast('Contracts are not deployed yet. Commissioning opens at launch.'); return; }
+  if (W.shield) { toast('This wallet already operates a unit.'); return; }
+  const wl = S.shield.whitelist.map(k => KX9_CONFIG.tokens[k]).filter(a => a && ethers.isAddress(a));
+  try {
+    const f = new ethers.Contract(KX9_CONFIG.factory, ABI.factory, W.signer);
+    toast('Commission: confirm in your wallet');
+    const tx = await f.commission([BigInt(S.shield.maxTrade * 1e6), BigInt(S.shield.dailyCap * 1e6), Math.round(S.shield.slippage * 100), S.shield.cooldown * 60], wl);
+    const r = await tx.wait();
+    const ev = r.logs.map(l => { try { return f.interface.parseLog(l); } catch (_) { return null; } }).find(x => x && x.name === 'UnitCommissioned');
+    toast(ev ? `${ev.args.serial} commissioned.` : 'Unit commissioned.');
+    addLog('operator', 'Commissioned', `Unit ${ev ? ev.args.serial : ''} commissioned on Robinhood Chain.`, '—', '—', { tx: r.hash });
+    await loadUnit(); renderWallet(); if (API.operator) await loadSession();
+  } catch (e) { toast(e.code === 'ACTION_REJECTED' ? 'Commission was rejected.' : 'Commission failed: ' + decodeErr(e)); }
+}
+
+function openWallet() { const p = $('#walletPop'); p.hidden = false; $('#walletBtn').setAttribute('aria-expanded', 'true'); renderWallet(); }
+function renderWallet() {
+  const p = $('#walletPop'); if (!p) return;
+  const c = KX9_CONFIG.chain;
+  if (!W.address) {
+    const list = walletList();
+    p.innerHTML = `<div class="wp-h"><b>Connect an EVM wallet</b><span class="eyebrow">${esc(c.name)} · ${c.chainId}</span></div>` +
+      (list.length ? `<div class="wp-list">${list.map((w, i) => `<button class="wp-wallet" data-wi="${i}">${w.info.icon ? `<img src="${esc(w.info.icon)}" alt="">` : '<i></i>'}<span>${esc(w.info.name)}</span></button>`).join('')}</div>`
+        : `<p>No EVM wallet was found in this browser. Install MetaMask, Rabby or Coinbase Wallet, or open KX-9 inside your wallet's browser.</p>`) +
+      `<p class="wp-note">Connect to view your wallet balance and on-chain unit.</p>`;
+  } else {
+    const ok = onChain();
+    const cls = classOf(W.kx9);
+    p.innerHTML = `<div class="wp-h"><b class="mono">${short(W.address)}</b><button class="btn ghost wp-mini" id="wpCopy">Copy</button></div>
+      <div class="wp-rows">
+        <div><span>Wallet</span><b>${esc(W.walletName || 'Wallet')}</b></div>
+        <div><span>Network</span>${ok ? `<b class="up">${esc(c.name)}</b>` : `<b class="down">Wrong network</b>`}</div>
+        <div><span>Balance</span><b class="mono">${W.eth != null ? Number(ethers.formatEther(W.eth)).toFixed(4) + ' ETH' : '—'}</b></div>
+        <div><span>$KX9</span><b class="mono">${!KX9_CONFIG.kx9Token ? 'At launch' : W.kx9 != null ? Number(ethers.formatUnits(W.kx9, 18)).toLocaleString('en-US') : '—'}</b></div>
+        <div><span>Class</span><b>${cls || 'At launch'}</b></div>
+        <div><span>Unit</span><b>${W.shield ? `<a href="${explorerAddr(W.shield)}" target="_blank" rel="noopener">KX-9-${String(W.agentId).padStart(4, '0')}</a>` : KX9_CONFIG.factory ? 'None yet' : 'Contracts at launch'}</b></div>
+      </div>
+      <div class="wp-actions">
+        ${ok ? '' : '<button class="btn primary" id="wpSwitch">Switch to Robinhood Chain</button>'}
+        ${ok && !W.signedIn ? '<button class="btn primary" id="wpSign">Sign in</button>' : ''}
+        ${ok && W.signedIn ? '<span class="pill ok">Signed in</span>' : ''}
+        ${ok && !W.shield && KX9_CONFIG.factory ? '<button class="btn" id="wpCommission">Commission unit</button>' : ''}
+        <a class="btn ghost" href="${explorerAddr(W.address)}" target="_blank" rel="noopener">Explorer</a>
+        <button class="btn ghost" id="wpDisconnect">Disconnect</button>
+      </div>`;
+  }
+}
+function syncWalletUi() {
+  const b = $('#walletBtn');
+  if (b) {
+    if (!W.address) b.innerHTML = 'Connect wallet';
+    else b.innerHTML = `<i class="wdot ${onChain() ? 'on' : 'bad'}"></i>${short(W.address)}`;
+  }
+  syncPublicIdentity();
+  syncMode();
+  render(current());
+  const st = $('#chainStatus');
+  if (st) {
+    const c = KX9_CONFIG.chain;
+    st.innerHTML = [
+      ['Network', `${esc(c.name)} · ${c.chainId}`, 'info'],
+      ['Backend RPC', esc(RPC_STATE.label), RPC_STATE.connected ? 'ok' : 'warn'],
+      ['Wallet', W.address ? short(W.address) + (onChain() ? '' : ' (wrong network)') : 'Not connected', W.address ? (onChain() ? 'ok' : 'warn') : 'off'],
+      ['Factory', KX9_CONFIG.factory ? `<a href="${explorerAddr(KX9_CONFIG.factory)}" target="_blank" rel="noopener">${short(KX9_CONFIG.factory)}</a>` : 'Deploys at launch', KX9_CONFIG.factory ? 'ok' : 'off'],
+      ['Shield vault', W.shield ? `<a href="${explorerAddr(W.shield)}" target="_blank" rel="noopener">${short(W.shield)}</a>` : 'None yet', W.shield ? 'ok' : 'off'],
+      ['Proposals', KX9_CONFIG.api ? 'KX-9 Core' : 'Not connected', KX9_CONFIG.api ? 'ok' : 'warn']
+    ].map(r => `<div class="mod"><span class="ic"><i class="sdot ${r[2]}"></i></span><div><b>${r[0]}</b><small>${r[1]}</small></div><span class="pill ${r[2]}">${r[2] === 'ok' ? 'Ready' : r[2] === 'warn' ? 'Check' : r[2] === 'info' ? 'Mainnet' : 'Pending'}</span></div>`).join('');
+  }
+}
+$('#walletBtn').addEventListener('click', () => { const p = $('#walletPop'); if (p.hidden) openWallet(); else { p.hidden = true; $('#walletBtn').setAttribute('aria-expanded', 'false'); } });
+$('#walletPop').addEventListener('click', e => {
+  const w = e.target.closest('[data-wi]'); if (w) { connectWallet(walletList()[+w.dataset.wi]); return; }
+  if (e.target.id === 'wpSwitch') switchChain();
+  if (e.target.id === 'wpSign') signIn();
+  if (e.target.id === 'wpCommission') commissionUnit();
+  if (e.target.id === 'wpDisconnect') disconnectWallet();
+  if (e.target.id === 'wpCopy') { const t = W.address; try { navigator.clipboard.writeText(t).then(() => toast('Address copied.'), () => toast(t)); } catch (_) { toast(t); } }
+});
+document.addEventListener('click', e => { if (!e.target.closest('.rel')) { $('#walletPop').hidden = true; $('#walletBtn').setAttribute('aria-expanded', 'false'); } });
+document.addEventListener('click', e => { if (e.target.id === 'commissionBtn') commissionUnit(); if (e.target.id === 'connectFromPassport') openWallet(); });
+
+/* Mode changes go on-chain when the unit is live */
+async function requestMode(m) {
+  if (m === S.mode) return;
+  const r = await chainTx(`Mode → ${cap(m)}`, c => c.setMode(MODES.indexOf(m)));
+  if (r === 'abort') return;
+  setMode(m);
+  if (REMOTE) apiCall('/units/' + API.agentId + '/mode', { method: 'PATCH', body: { mode: m, txHash: (r && r.hash) || null } }).then(syncNow).catch(e => { toast(e.message); syncNow(); });
+  if (r && r.hash) { S.log[0].tx = r.hash; S.log[0].text += ` <a href="${explorerTx(r.hash)}" target="_blank" rel="noopener">tx</a>`; render(current()); }
+}
+// Runs inside the original app closure. Only verified reads and user-confirmed
+// contract actions may populate public state; missing records stay empty.
+function publicEmpty(message) {
+  return '<p class="note public-empty">' + esc(message) + '</p>';
+}
+function unitSerial() {
+  return live() && W.agentId != null ? 'KX-9-' + String(W.agentId).padStart(4, '0') : 'KX-9';
+}
+function syncPublicIdentity() {
+  const serial = unitSerial(), cls = classOf(W.kx9) || '—';
+  $('.unit-id b').textContent = serial;
+  $('#v-hangar h1').textContent = live() ? 'Unit ' + serial : 'Your KX-9 unit';
+  $('#hudSerial').textContent = live() ? serial : '—';
+  $('#hudRegistry').textContent = '—';
+  $('#hudClass').textContent = cls;
+  $('#railClass').textContent = cls;
+  $('.class-chip small').textContent = !W.address ? 'Connect your wallet' : live() ? 'On-chain unit connected' : 'No unit connected';
+}
+function syncMode() {
+  const ready = live();
+  $$('[data-mode]').forEach(b => {
+    b.disabled = !ready;
+    b.setAttribute('aria-pressed', String(ready && b.dataset.mode === S.mode));
+  });
+  const label = ready ? cap(S.mode) : 'Not connected';
+  $('#modePill').textContent = label;
+  $('#modePill').className = 'pill ' + (ready ? 'info' : 'off');
+  $('#hudMode').textContent = ready ? cap(S.mode) : '—';
+  $('#hudPower').textContent = '—';
+  $('#statusDot').classList.toggle('standby', !ready || S.mode === 'standby');
+  $('#statusText').textContent = ready ? label + ' · Robinhood Chain' : W.address ? 'No unit connected' : 'Connect wallet';
+  $('#standbyBanner').hidden = !ready || S.mode !== 'standby';
+  const kill = $('#killBtn'); if (kill) kill.disabled = !ready;
+}
+function rHangar() {
+  const mods = [
+    ['i-sensor', 'Mainnet connection', RPC_STATE.label, RPC_STATE.connected ? 'ok' : 'off', RPC_STATE.connected ? 'Connected' : 'Unavailable'],
+    ['i-core', 'Decision service', 'No decision service connected', 'off', 'Not connected'],
+    ['i-shield', 'Shield', live() ? 'On-chain vault connected' : 'Connect an on-chain unit', live() ? 'ok' : 'off', live() ? 'Connected' : 'Not connected'],
+    ['i-act', 'Execution', 'Trading execution is not connected', 'off', 'Not connected'],
+    ['i-box', 'Black Box', 'Confirmed actions from this session', 'info', String(S.log.length)]
+  ];
+  $('#modules').innerHTML = mods.map(m => '<div class="mod"><span class="ic"><svg><use href="#' + m[0] + '"/></svg></span><div><b>' + m[1] + '</b><small>' + esc(m[2]) + '</small></div><span class="pill ' + m[3] + '">' + m[4] + '</span></div>').join('');
+}
+function rKpis() {
+  const values = [
+    ['Wallet balance', onChain() && W.eth != null ? Number(ethers.formatEther(W.eth)).toFixed(4) + ' ETH' : '—', W.address ? 'Robinhood Chain' : 'Connect your wallet'],
+    ['Portfolio value', '—', 'Valuation data not connected'],
+    ['24h change', '—', 'No price history available'],
+    ['Shield daily usage', live() ? usd(S.used, 0) : '—', live() ? 'Read from your Shield vault' : 'Connect an on-chain unit']
+  ];
+  $('#kpis').innerHTML = values.map(k => '<div class="panel kpi"><span class="eyebrow">' + k[0] + '</span><span class="v">' + k[1] + '</span><span class="d">' + k[2] + '</span></div>').join('');
+}
+function rCommand() {
+  rKpis();
+  $('#crew').innerHTML = '';
+  $('#propPill').textContent = 'Not connected';
+  $('#propPill').className = 'pill off';
+  $('#proposal').innerHTML = publicEmpty('Connect a decision service to receive trade proposals.');
+  $('#eqChart').innerHTML = publicEmpty('Portfolio history will appear when verified records are available.');
+  $('#alloc').innerHTML = ''; $('#allocKey').innerHTML = '';
+  $('#feed').innerHTML = publicEmpty('No trade decisions recorded.');
+  $('#reportDate').textContent = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', timeZone:'UTC'}) + ' UTC';
+  $('#report').innerHTML = publicEmpty('Your report will appear after confirmed trading activity.');
+  rHoldings();
+}
+function rHoldings() {
+  $('#holdings').innerHTML = '<thead><tr><th>Asset</th><th class="r">Balance</th><th class="r">Value</th></tr></thead><tbody>' +
+    (onChain() && W.eth != null ? '<tr><td><b>ETH</b></td><td class="r mono">' + Number(ethers.formatEther(W.eth)).toFixed(6) + '</td><td class="r">—</td></tr>' :
+      '<tr><td colspan="3" class="note">Connect your wallet to view verified balances.</td></tr>') + '</tbody>';
+}
+function feedRow(l) {
+  return '<div class="feed-row"><time>' + hhmm(l.t) + '</time><span class="role-tag role-' + l.role + '">' + ROLE[l.role] + '</span><p><b>' + l.event + '.</b> ' + l.text + '</p></div>';
+}
+function rProtocols() {
+  const protocols = [
+    ['Accumulate', 'Schedule recurring asset purchases.'],
+    ['Balance', 'Keep asset weights within your chosen allocation.'],
+    ['Guard', 'Set take-profit and stop-loss rules.'],
+    ['Trend', 'Define moving-average entry and exit rules.']
+  ];
+  $('#protoGrid').innerHTML = protocols.map(([name, description]) =>
+    '<div class="panel proto off"><div class="proto-h"><div><h2>' + name + '</h2><p>' + description + '</p></div><span class="pill off">Not connected</span></div>' +
+    '<p class="note">Protocol service is not connected.</p></div>').join('');
+  $('#saveProto').disabled = true;
+}
+// Preserve the original contract-backed Shield editor only when a real unit
+// has been loaded. Default form values must never be displayed as chain data.
+const renderConnectedShield = rShield;
+rShield = function() {
+  if (live()) { renderConnectedShield(); return; }
+  $('#limits').innerHTML = '<div class="panel-h"><h2>Limits</h2><span class="pill off">Not connected</span></div>' + publicEmpty('Connect an on-chain unit to read and update its Shield limits.');
+  $('#usage').innerHTML = publicEmpty('No Shield vault connected.');
+  $('#diff').innerHTML = publicEmpty('No changes to sign.');
+  $('#vetoes').innerHTML = publicEmpty('No verified veto records available.');
+  $('#shieldTx').innerHTML = '';
+  $('#signShield').disabled = true; $('#resetShield').disabled = true;
+};
+function rUsage() {
+  $('#usage').innerHTML = live() ?
+    '<div class="kpi"><span class="v">' + usd(S.used, 0) + '</span><span class="d">of ' + usd(S.shield.dailyCap, 0) + ' daily cap · read from your Shield vault</span></div>' :
+    publicEmpty('No Shield vault connected.');
+}
+function rPassport() {
+  const serial = unitSerial();
+  $('#identityPlate').innerHTML = '<div class="plate-top"><div><span class="eyebrow">Unit identity</span><div class="serial">' + esc(serial) + '</div></div><span class="pill ' + (live() ? 'ok' : 'off') + '">' + (live() ? 'Connected' : 'Not connected') + '</span></div><dl>' +
+    [['Agent ID', live() && W.agentId != null ? String(W.agentId) : '—'],
+     ['Chain', 'Robinhood Chain · 4663'],
+     ['Operator', W.address ? short(W.address) : '—'],
+     ['Shield contract', live() ? '<a href="' + explorerAddr(W.shield) + '" target="_blank" rel="noopener">' + short(W.shield) + '</a>' : '—'],
+     ['Class', classOf(W.kx9) || '—']].map(r => '<div><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>').join('') + '</dl>';
+  $('#proofs').innerHTML = publicEmpty('No verified validation records available.');
+  $('#classes').innerHTML = '<thead><tr><th>Class</th><th>Status</th></tr></thead><tbody>' +
+    ['Observer', 'Mk I', 'Mk II', 'Mk III'].map(c => '<tr><td>' + c + '</td><td>' + (classOf(W.kx9) === c ? 'Verified holding' : '—') + '</td></tr>').join('') + '</tbody>';
+}
+$('#diagBtn').addEventListener('click', async () => {
+  const button = $('#diagBtn'); button.disabled = true; button.textContent = 'Checking connection…';
+  try {
+    await refreshBackendRpc();
+    toast(RPC_STATE.connected ? 'Mainnet connection verified at block ' + RPC_STATE.block + '.' : RPC_STATE.label);
+  } finally { button.disabled = false; button.textContent = 'Run diagnostic'; }
+});
+
+// Wallet-owned, persistent Core API. No browser-generated market data or fills.
+var REMOTE = false;
+const API = {operator: null, token: null, agentId: null, units: [], timer: null, stream: null, connected: false, config: null, state: null, syncing: false, dirty: false, confirmDelete: false};
+const DELETE_CONFIRMATION='<p class="note" style="margin-top:14px">This permanently deletes saved off-chain settings and records. Your vault funds, pending transactions and on-chain permissions are unchanged. Set the vault to Standby on-chain first if you need trading to stop.</p><button class="btn danger" id="coreDeleteYes">Permanently delete off-chain data</button><button class="btn ghost" id="coreDeleteNo">Cancel</button>';
+const CORE_PROTOCOLS = {
+  accumulate:{on:false,asset:'ETH',amount:100,every:'Daily'},
+  balance:{on:false,target:'Growth 60/40',drift:5},
+  guard:{on:false,tp:12,sl:6},
+  trend:{on:false,asset:'NVDA',size:250,window:20},
+  physical:{on:false,amount:150,every:'Weekly',dip:5,dipAmount:300}
+};
+Object.assign(S.protocols, structuredClone(CORE_PROTOCOLS));
+async function apiCall(path, options = {}) {
+  const response = await fetch('/api/v1' + path, {
+    method: options.method || 'GET', credentials: 'same-origin',
+    headers: {'Content-Type':'application/json', ...(API.token ? {Authorization:'Bearer '+API.token} : {}), ...(options.headers || {})},
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    signal: AbortSignal.timeout(20000)
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    if (response.status === 401 && API.operator) stopRemote();
+    const error = new Error(body.error?.message || 'The service is unavailable.');
+    error.status = response.status; throw error;
+  }
+  return body;
+}
+function stopRemote() {
+  REMOTE = false; API.operator = null; API.token = null; API.agentId = null; API.units = []; API.state = null; API.passport = null; API.dirty = false; API.confirmDelete = false;
+  clearInterval(API.timer); API.stream?.abort(); API.stream = null;
+  S.log = []; S.pending = null; S.stage = 'idle'; S.holdings = {};
+  Object.assign(S.protocols, structuredClone(CORE_PROTOCOLS));
+  W.signedIn = false; W.unitLoaded = false;
+}
+async function loadSession() {
+  const session = await apiCall('/auth/session');
+  API.operator = session.operator; API.units = session.units;
+  if (!API.units.some(u => u.agentId === API.agentId)) API.agentId = API.units[0]?.agentId ?? null;
+  const path = API.agentId === null ? '/settings/protocols' : '/units/'+API.agentId+'/protocols';
+  S.protocols = await apiCall(path); API.dirty = false;
+  if (W.address && W.address !== API.operator) {
+    await apiCall('/auth/logout', {method:'POST',body:{}});
+    stopRemote(); return;
+  }
+  W.signedIn = !!(W.address && W.address === API.operator);
+  REMOTE = API.agentId !== null;
+  clearInterval(API.timer); API.timer = setInterval(() => syncNow(), 6000);
+  API.stream?.abort(); API.stream = new AbortController();
+  streamUpdates(API.stream.signal);
+  await syncNow(); renderWallet(); render(current());
+}
+async function apiLogin() {
+  if (!W.signer || !onChain()) {openWallet(); toast('Connect your wallet on Robinhood mainnet first.'); return;}
+  try {
+    const nonce = await apiCall('/auth/nonce', {method:'POST',body:{address:W.address,chainId:4663}});
+    const signature = await W.signer.signMessage(nonce.message);
+    const session = await apiCall('/auth/verify', {method:'POST',body:{message:nonce.message,signature}});
+    API.token = session.token;
+    await loadSession();
+    toast(API.units.length ? 'Signed in. On-chain units verified.' : 'Signed in. You can save protocols; no on-chain unit is connected yet.');
+  } catch (error) {toast(error.code === 4001 || error.code === 'ACTION_REJECTED' ? 'Signature rejected.' : error.message);}
+}
+async function streamUpdates(signal) {
+  while (!signal.aborted && API.operator) {
+    try {
+      const response = await fetch('/api/v1/stream', {credentials:'same-origin',headers:API.token ? {Authorization:'Bearer '+API.token} : {},signal});
+      if (!response.ok || !response.body) break;
+      const reader = response.body.getReader(), decoder = new TextDecoder(); let buffer = '';
+      while (!signal.aborted) {
+        const {done,value} = await reader.read(); if (done) break;
+        buffer += decoder.decode(value,{stream:true});
+        const events = buffer.split('\n\n'); buffer = events.pop() || '';
+        if (events.some(e => e.includes('event: updated'))) syncNow();
+      }
+    } catch (_) {if (signal.aborted) return;}
+    await new Promise(resolve => setTimeout(resolve, 3000));
+  }
+}
+const EVENT_LABEL = {'proposal.created':'Proposal','risk.approved':'Approved','risk.vetoed':'Veto','operator.approved':'Approved','operator.rejected':'Rejected','execution.submitted':'Submitted','execution.confirmed':'Executed','execution.failed':'Failed','mode.changed':'Mode change','shield.updated':'Shield updated','protocols.updated':'Protocols updated','system.diagnostic':'Diagnostic','system.online':'Unit connected'};
+async function syncNow() {
+  if (!API.operator || API.syncing) return;
+  API.syncing = true;
+  try {
+    if (API.agentId !== null) {
+      const [state,passport] = await Promise.all([apiCall('/units/'+API.agentId+'/state'),apiCall('/units/'+API.agentId+'/passport')]);
+      API.state = state;
+      API.passport = passport;
+      S.mode = state.unit.mode; S.used = state.shield.usedToday;
+      const editing = $('#signShield') && !$('#signShield').disabled;
+      S.shield = {...state.shield}; delete S.shield.usedToday;
+      if (!editing) S.draft = structuredClone(S.shield);
+      if (!API.dirty) S.protocols = structuredClone(state.protocols);
+      S.log = state.log.map(l => ({t:new Date(l.at),role:l.role,event:EVENT_LABEL[l.event]||l.event,text:esc(l.text),asset:l.asset||'—',amt:l.usd??'—',tx:l.txHash,proof:l.validation}));
+      S.holdings = Object.fromEntries(state.telemetry.holdings.map(h => [h.asset,h.amount]));
+      if (W.address === API.operator && onChain()) {W.shield=state.unit.shield;W.agentId=state.unit.agentId;W.unitLoaded=true;}
+    }
+    if (!(current()==='protocols' && (API.dirty || document.activeElement?.closest?.('#protoGrid')))) render(current());
+    syncMode(); renderUnitSelector();
+  } catch(error) {if (error.status === 404) {API.agentId=null;API.state=null;REMOTE=false;} toast(error.message);}
+  finally {API.syncing=false;}
+}
+function coreInput(label, key, value, type='number', choices=null, min=1, max=1000000) {
+  const id='core-'+key;
+  return '<div class="field"><label for="'+id+'">'+label+'</label>'+
+    (choices ? '<select id="'+id+'" data-key="'+key+'">'+choices.map(c=>'<option value="'+esc(c)+'"'+(c===value?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>' :
+      '<input id="'+id+'" data-key="'+key+'" type="'+type+'" value="'+esc(value)+'" min="'+min+'" max="'+max+'" step="1">')+'</div>';
+}
+function rProtocols() {
+  const periods=['Daily','Weekly','Monthly'], assets=['NVDA','TSLA','AAPL','AMZN','PLTR','ETH'], p=S.protocols;
+  const cards = [
+    ['accumulate','Accumulate','Schedule recurring asset purchases.',
+      coreInput('Asset','accumulate.asset',p.accumulate.asset,'text',assets)+coreInput('Buy amount (USDC)','accumulate.amount',p.accumulate.amount,'number',null,10)+coreInput('Every','accumulate.every',p.accumulate.every,'text',periods)],
+    ['balance','Balance','Keep your verified holdings near a target allocation.',
+      coreInput('Allocation','balance.target',p.balance.target,'text',['Growth 60/40','Balanced 40/60','Defensive 20/80'])+coreInput('Drift threshold (%)','balance.drift',p.balance.drift,'number',null,1,25)],
+    ['guard','Guard','Uses confirmed purchase cost, not an invented entry price.',
+      coreInput('Take profit (%)','guard.tp',p.guard.tp,'number',null,1,1000)+coreInput('Stop loss (%)','guard.sl',p.guard.sl,'number',null,1,100)],
+    ['trend','Trend','Compares verified oracle observations with a moving average.',
+      coreInput('Asset','trend.asset',p.trend.asset,'text',assets)+coreInput('Position size (USDC)','trend.size',p.trend.size,'number',null,10)+coreInput('Oracle observations','trend.window',p.trend.window,'number',null,5,200)],
+    ['physical','Physical AI · NVDA','A rule-based NVIDIA stock-token allocation: scheduled buys plus an optional dip allocation. Not NVIDIA AI or an NVIDIA partnership.',
+      coreInput('Scheduled buy (USDC)','physical.amount',p.physical.amount,'number',null,10)+coreInput('Every','physical.every',p.physical.every,'text',periods)+coreInput('Dip threshold (%)','physical.dip',p.physical.dip,'number',null,1,30)+coreInput('Dip buy (USDC)','physical.dipAmount',p.physical.dipAmount,'number',null,10)]
+  ];
+  $('#protoGrid').innerHTML='<div class="panel" style="grid-column:1/-1"><p class="note">'+
+    (API.operator ? 'Signed in as '+esc(short(API.operator))+'. Settings are saved to your account. '+(API.agentId===null?'No on-chain unit is connected; saved protocols will not trade.':'A selected protocol still needs price feeds, a verified quote and Shield permission.') :
+      'Connect your wallet and sign in to save protocol settings. No trading starts when you edit this form.')+
+    '</p><div class="actions" style="margin-top:12px">'+(API.operator ? '<button class="btn ghost" id="coreExport">Export my data</button><button class="btn ghost" id="coreLogout">Sign out</button><button class="btn ghost" id="coreDelete">Delete off-chain data</button>' : '<button class="btn primary" id="coreSignin">Connect &amp; sign in</button>')+'</div><div id="coreDeleteConfirm">'+(API.operator&&API.confirmDelete?DELETE_CONFIRMATION:'')+'</div></div>'+
+    cards.map(([id,name,description,fields])=>'<div class="panel proto" data-core-protocol="'+id+'"'+(id==='physical'?' style="grid-column:1/-1"':'')+'><div class="proto-h"><div><h2>'+name+'</h2><p>'+description+'</p></div><button class="switch'+(p[id].on?' on':'')+'" role="switch" aria-checked="'+p[id].on+'" aria-label="Select '+name+'" data-core-toggle="'+id+'"'+(!API.operator?' disabled':'')+'></button></div><fieldset style="border:0;padding:0;margin:14px 0"'+(!API.operator?' disabled':'')+'><div class="fields">'+fields+'</div></fieldset><div class="proto-foot"><span>'+(API.dirty?'Unsaved changes':'Saved settings')+'</span><span class="pill '+(p[id].on?'info':'off')+'">'+(p[id].on?'Selected':'Off')+'</span></div></div>').join('');
+  $('#saveProto').disabled=!API.operator;
+}
+$('#protoGrid').addEventListener('click', e=>{
+  const toggle=e.target.closest('[data-core-toggle]');
+  if(toggle&&API.operator){S.protocols[toggle.dataset.coreToggle].on=!S.protocols[toggle.dataset.coreToggle].on;API.dirty=true;rProtocols();}
+});
+$('#protoGrid').addEventListener('change', e=>{
+  const key=e.target.dataset.key;if(!key||!API.operator)return;
+  const [protocol,field]=key.split('.');
+  S.protocols[protocol][field]=e.target.type==='number'?Number(e.target.value):e.target.value;
+  API.dirty=true;
+});
+$('#protoGrid').addEventListener('input', e=>{
+  const key=e.target.dataset.key;if(!key||!API.operator)return;
+  const [protocol,field]=key.split('.');
+  S.protocols[protocol][field]=e.target.type==='number'?Number(e.target.value):e.target.value;API.dirty=true;
+});
+$('#saveProto').addEventListener('click',async()=>{
+  if(!API.operator)return;
+  const button=$('#saveProto');button.disabled=true;
+  try {
+    S.protocols=await apiCall(API.agentId===null?'/settings/protocols':'/units/'+API.agentId+'/protocols',{method:'PUT',body:S.protocols});
+    API.dirty=false;toast('Protocol settings saved. No trade was sent.');
+  }catch(error){toast(error.message);}
+  finally{rProtocols();}
+});
+const emptyCommand=rCommand;
+rCommand=function(){
+  emptyCommand();
+  if(!API.state)return;
+  const t=API.state.telemetry;
+  $('#kpis').innerHTML=[
+    ['Vault value',t.portfolioUsd===null?'—':usd(t.portfolioUsd),'Verified token balances; price required for valuation'],
+    ['Exposure',t.exposurePct===null?'—':fmt(t.exposurePct,1)+'%','Non-stable assets'],
+    ['Shield daily usage',usd(t.usedToday),'Read from the Shield'],
+    ['Decision service',API.connected?'Connected':'Unavailable','Deterministic rules and verified risk checks']
+  ].map(k=>'<div class="panel kpi"><span class="eyebrow">'+k[0]+'</span><span class="v">'+k[1]+'</span><span class="d">'+k[2]+'</span></div>').join('');
+  $('#holdings').innerHTML='<thead><tr><th>Asset</th><th class="r">Balance</th><th class="r">Price</th><th class="r">Value</th></tr></thead><tbody>'+
+    (t.holdings.map(h=>'<tr><td>'+esc(h.asset)+'</td><td class="r">'+fmt(h.amount,6)+'</td><td class="r">'+(h.priceUsd===null?'—':usd(h.priceUsd))+'</td><td class="r">'+(h.valueUsd===null?'—':usd(h.valueUsd))+'</td></tr>').join('')||'<tr><td colspan="4">No configured token balances available.</td></tr>')+'</tbody>';
+  $('#feed').innerHTML=S.log.slice(0,7).map(feedRow).join('')||publicEmpty('No decisions recorded.');
+  const p=API.state.pending;
+  if(p){
+    $('#propPill').textContent=({operator:'Needs approval',veto:'Blocked',exec:'Submitted',done:'Confirmed',failed:'Failed',rejected:'Rejected'})[p.stage]||'Checking';
+    $('#proposal').innerHTML='<div class="prop-main"><span class="what">'+cap(p.side)+' '+esc(p.asset)+' · '+usd(p.usd)+'</span></div><p class="reason">'+esc(p.reason)+'</p>'+
+    (p.ruleFacts&&p.ruleFacts!==p.reason?'<p class="note">Rule facts: '+esc(p.ruleFacts)+'</p>':'')+
+      (p.risk?'<div class="checks">'+p.risk.checks.map(c=>'<div><b class="'+(c.ok?'ok':'bad')+'">'+(c.ok?'Pass':'Blocked')+'</b> '+esc(c.key)+' <span>'+esc(c.detail)+'</span></div>').join('')+'</div>':'')+
+      (p.stage==='operator'?'<div class="actions"><button class="btn primary" id="coreApprove">Approve on-chain</button><button class="btn ghost" id="coreReject">Reject</button></div>':'')+
+      (p.txHash?'<a href="'+explorerTx(p.txHash)+'" target="_blank" rel="noopener">View mainnet transaction</a>':'');
+  }else{$('#propPill').textContent='No proposal';$('#proposal').innerHTML=publicEmpty('No proposal is waiting. The engine only uses verified prices and configured protocols.');}
+  $('#report').innerHTML=publicEmpty(S.log.length+' confirmed off-chain records. Transaction confirmation is shown separately.');
+};
+const baseHangar=rHangar;
+rHangar=function(){
+  baseHangar();
+  const coreRow=$$('#modules .mod')[1];
+  if(coreRow)coreRow.innerHTML='<span class="ic"><svg><use href="#i-core"/></svg></span><div><b>Decision service</b><small>'+(API.connected?'KX-9 Core API connected':'Core API unavailable')+'</small></div><span class="pill '+(API.connected?'ok':'off')+'">'+(API.connected?'Connected':'Unavailable')+'</span>';
+};
+function renderUnitSelector(){
+  let container=$('#coreUnitSelector');
+  if(!container){
+    container=document.createElement('div');container.id='coreUnitSelector';container.className='field';
+    $('#v-hangar .view-head').append(container);
+  }
+  container.innerHTML=API.units.length>1?'<label for="coreUnitSelect">Selected unit</label><select id="coreUnitSelect">'+
+    API.units.map(u=>'<option value="'+u.agentId+'"'+(API.agentId===u.agentId?' selected':'')+'>'+esc(u.serial)+'</option>').join('')+'</select>':'';
+}
+document.addEventListener('change',async event=>{
+  if(event.target.id!=='coreUnitSelect')return;
+  API.agentId=Number(event.target.value);API.state=null;API.dirty=false;
+  S.protocols=await apiCall('/units/'+API.agentId+'/protocols');
+  await syncNow();syncWalletUi();
+});
+const basePassport=rPassport;
+rPassport=function(){
+  basePassport();
+  const p=API.passport;
+  if(!p||API.agentId===null)return;
+  $('#identityPlate').innerHTML='<div class="plate-top"><div><span class="eyebrow">Verified on-chain unit</span><div class="serial">'+esc(p.serial)+'</div></div><span class="pill ok">Verified</span></div><dl>'+
+    [['Agent ID',String(p.agentId)],['Operator',short(p.operator)],['Shield',short(p.shield)],['Class',p.class],['Chain','Robinhood Chain · 4663']].map(row=>'<div><dt>'+row[0]+'</dt><dd>'+esc(row[1])+'</dd></div>').join('')+'</dl>';
+  $('#proofs').innerHTML=S.log.slice(0,5).map(l=>'<div class="feed-row"><time>'+hhmm(l.t)+'</time><p><b>'+esc(l.event)+'</b><br><code>'+esc(l.proof||'No integrity record')+'</code></p></div>').join('')||publicEmpty('No integrity records available.');
+};
+async function requestMode(mode) {
+  if(mode===S.mode)return;
+  if(!live()||API.agentId===null){toast('Connect an on-chain unit first.');return;}
+  const result=await chainTx('Change mode',c=>c.setMode(MODES.indexOf(mode)));
+  if(result==='abort'||!result?.hash)return;
+  try{await apiCall('/units/'+API.agentId+'/mode',{method:'PATCH',body:{mode,txHash:result.hash}});await syncNow();await loadUnit();}catch(error){toast(error.message);}
+}
+async function remoteApprove(p) {
+  if(!p||!live())return;
+  const result=await chainTx('Approve proposal',c=>c.approveProposal(ethers.id(p.id),BigInt(Math.ceil(p.usd*1e6)),BigInt(Math.floor(Date.now()/1000)+900)));
+  if(result==='abort'||!result?.hash)return;
+  try{await apiCall('/proposals/'+p.id+'/approve',{method:'POST',body:{txHash:result.hash}});await syncNow();}catch(error){toast(error.message);}
+}
+async function remoteReject(p) {
+  try{await apiCall('/proposals/'+p.id+'/reject',{method:'POST',body:{}});await syncNow();}catch(error){toast(error.message);}
+}
+async function signOutCore() {
+  try{await apiCall('/auth/logout',{method:'POST',body:{}});}catch(_){}
+  stopRemote();renderWallet();render(current());toast('Signed out.');
+}
+document.addEventListener('click', async e=>{
+  try{
+    if(e.target.id==='coreSignin'){if(W.address)await apiLogin();else openWallet();}
+    if(e.target.id==='coreLogout')await signOutCore();
+    if(e.target.id==='coreApprove')await remoteApprove(API.state?.pending);
+    if(e.target.id==='coreReject')await remoteReject(API.state?.pending);
+    if(e.target.id==='coreExport'){
+      const data=await apiCall('/account'),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+      const a=document.createElement('a');a.href=url;a.download='kx9-account.json';a.click();URL.revokeObjectURL(url);
+    }
+    if(e.target.id==='coreDelete'){API.confirmDelete=true;$('#coreDeleteConfirm').innerHTML=DELETE_CONFIRMATION;}
+    if(e.target.id==='coreDeleteNo'){API.confirmDelete=false;$('#coreDeleteConfirm').innerHTML='';}
+    if(e.target.id==='coreDeleteYes'){await apiCall('/account',{method:'DELETE',body:{},headers:{'X-KX9-Confirm':'delete-offchain-data'}});stopRemote();renderWallet();render(current());toast('Off-chain data deleted. Vault funds are unchanged.');}
+  }catch(error){toast(error.message);}
+});
+async function bootstrapCore() {
+  try{
+    const [config,health]=await Promise.all([apiCall('/config'),apiCall('/health')]);
+    API.config=config;API.connected=health.ok===true;
+    KX9_CONFIG.factory=config.factory;KX9_CONFIG.kx9Token=config.kx9Token;KX9_CONFIG.tokens=config.tokens;KX9_CONFIG.classThresholds=config.classThresholds;
+    try{await loadSession();}catch(error){if(error.status!==401)toast(error.message);}
+    if(W.address)await loadUnit();
+  }catch(_){API.connected=false;}
+  render(current());renderUnitSelector();
+}
+const originalDisconnect=disconnectWallet;
+disconnectWallet=function(){signOutCore();originalDisconnect();};
+window.addEventListener('focus',()=>{if(API.operator)syncNow();});
+window.addEventListener('pagehide',()=>API.stream?.abort());
+bootstrapCore();
+
+function renderHistory() {
+  $('#historyRun').disabled=!API.operator;
+  if(!API.operator)$('#historyStatus').textContent='Connect your wallet and sign in first.';
+  else if(!$('#historyStatus').dataset.result)$('#historyStatus').textContent='Uses your saved protocol settings. Unsaved edits are not included.';
+}
+$('#historyProtocol').addEventListener('change',()=>{
+  const physical=$('#historyProtocol').value==='physical';
+  $('#historyAsset').disabled=physical;
+  if(physical)$('#historyAsset').value='NVDA';
+});
+$('#historyForm').addEventListener('submit',async event=>{
+  event.preventDefault();
+  if(!API.operator){toast('Sign in with your wallet first.');return;}
+  const button=$('#historyRun'),status=$('#historyStatus');button.disabled=true;status.textContent='Reading historical prices…';
+  try{
+    const file=$('#historyFile').files[0];
+    if(!file||file.size>65536)throw new Error('Choose a CSV file smaller than 64 KB.');
+    const lines=(await file.text()).replace(/^\uFEFF/,'').trim().split(/\r?\n/);
+    if(!/^date\s*,\s*close$/i.test(lines.shift()?.trim()||''))throw new Error('CSV header must be date,close.');
+    if(lines.length<2||lines.length>366)throw new Error('CSV needs between 2 and 366 daily rows.');
+    const history=lines.map(line=>{
+      const columns=line.split(',');
+      if(columns.length!==2)throw new Error('Each CSV row must contain only date and close.');
+      return {date:columns[0].trim(),close:Number(columns[1].trim())};
+    });
+    const protocol=$('#historyProtocol').value;
+    const result=await apiCall('/simulations',{method:'POST',body:{protocol,asset:protocol==='physical'?'NVDA':$('#historyAsset').value,capital:Number($('#historyCapital').value),history}});
+    $('#historyResults').innerHTML='<p class="note">'+esc(result.source)+' · '+esc(result.startDate)+' to '+esc(result.endDate)+'</p><div class="metrics" style="margin-top:20px">'+[
+      ['Protocol return',fmt(result.returnPct,2)+'%'],['Buy & hold',fmt(result.holdReturnPct,2)+'%'],
+      ['Max drawdown',fmt(result.maxDrawdownPct,2)+'%'],['Trades',result.trades],['Ending value',usd(result.endingUsd)]
+    ].map(([label,value])=>'<div class="metric"><span class="eyebrow">'+label+'</span><b>'+value+'</b></div>').join('')+
+      '</div><p class="note" style="margin-top:20px">'+esc(result.assumptions)+'</p>';
+    status.textContent='Historical test complete. No transaction was sent.';status.dataset.result='true';
+  }catch(error){status.textContent=error.message;}
+  finally{button.disabled=false;}
+});
+
+syncWalletUi();
+async function refreshBackendRpc() {
+  try {
+    const response = await fetch('/api/rpc/status', { cache: 'no-store', signal: AbortSignal.timeout(15000) });
+    const status = await response.json();
+    RPC_STATE.connected = response.ok && status.connected === true && status.chainId === 4663;
+    RPC_STATE.block = status.latestBlock;
+    const errors = {
+      RPC_DNS_UNAVAILABLE: 'provider address cannot be resolved',
+      RPC_WRONG_NETWORK: 'provider is not Robinhood mainnet',
+      RPC_NOT_CONFIGURED: 'server secret is missing',
+      RPC_TIMEOUT: 'provider timed out',
+      RPC_STALE_BLOCK: 'provider blocks are out of date'
+    };
+    RPC_STATE.label = RPC_STATE.connected ? 'Mainnet RPC · block ' + status.latestBlock :
+      'RPC unavailable · ' + (errors[status.error] || 'provider connection failed');
+  } catch (_) {
+    RPC_STATE.connected = false;
+    RPC_STATE.label = 'RPC unavailable · backend unreachable';
+  }
+  const chip = $('#rpcStatus');
+  if (chip) {
+    chip.textContent = RPC_STATE.label;
+    chip.className = 'chip ' + (RPC_STATE.connected ? 'live' : 'warn');
+  }
+  syncWalletUi();
+}
+refreshBackendRpc();
+setInterval(refreshBackendRpc, 30000);
+syncMode();route();setMood('idle');scheduleProposal(3500);
+})();
+</script>
+
+</html>

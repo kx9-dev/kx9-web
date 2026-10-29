@@ -1,0 +1,3 @@
+import test from "node:test";import assert from "node:assert/strict";import fs from "node:fs";
+for(const file of ["index.html","app/index.html","docs.html","privacy.html","terms.html","risk.html"])test(file+" has project and contact links",()=>{const s=fs.readFileSync("public/"+file,"utf8");assert(s.includes('https://github.com/kx9-dev'));assert(s.includes('mailto:dev@kx9.tech'));});
+test("existing app includes the five protocols and historical testing",()=>{const s=fs.readFileSync("public/app/index.html","utf8");assert(s.includes("Physical AI · NVDA"));assert(s.includes("Historical test"));assert(s.includes("const CORE_PROTOCOLS"));});
